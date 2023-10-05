@@ -1,11 +1,11 @@
 <template>
     <div class="warpper">
         <aside>
-            <h4 class="title_dashboard">Dashboard</h4>
+            <h4 class="title_dashboard">CMS Admin</h4>
             <ul>
                 <li v-for="(item,index) in routes" :key="index">
                     <router-link :to="item.path">
-                        <div>
+                        <div class="item">
                             <span>{{ item.name }}</span>
                         </div>
                     </router-link>
@@ -31,13 +31,16 @@ import {routes} from '../router/Route'
         font-weight: 700;
         font-size: 24px;
     }
+
     ul {
         padding: 0;
     }
+
     ul > li {
         list-style-type: none;
-        padding: 12px 18px;
+    
     }
+
     ul > li a {
         text-decoration: none;
         color: #4fc08d;
@@ -45,6 +48,16 @@ import {routes} from '../router/Route'
         &:hover{
             background-color: #ececec;
         }
+    }
+
+    .item {
+        padding: 12px 18px;
+        text-transform: capitalize;
+    }
+
+    a.router-link-active .item {
+        background-color: #4fc08d;
+        color: #fff;
     }
 }
 </style>
