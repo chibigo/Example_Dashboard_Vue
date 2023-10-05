@@ -3,16 +3,11 @@
         <aside>
             <h4 class="title_dashboard">Dashboard</h4>
             <ul>
-                <li>
-                    <router-link to="/">
+                <li v-for="(item,index) in routes" :key="index">
+                    <router-link :to="item.path">
                         <div>
-                            <span>Home</span>
+                            <span>{{ item.name }}</span>
                         </div>
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/product">
-                        <span>Product</span>
                     </router-link>
                 </li>
             </ul>
@@ -22,6 +17,7 @@
 
 <script setup>
 import {RouterLink} from 'vue-router'
+import {routes} from '../router/Route'
 </script>
 
 <style lang="scss" scoped>
