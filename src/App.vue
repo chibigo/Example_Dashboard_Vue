@@ -1,12 +1,16 @@
 <template>
   <div id="root">
     <SidebarMenu class="sidebar"/>
-    <RouterView class="router-view"/>
+    <div class="page">
+      <Header />
+      <RouterView class="router-view"/>
+    </div>
   </div>
 </template>
 <script setup>
 import {RouterView } from 'vue-router'
 import SidebarMenu from './components/SidebarMenu.vue';
+import Header from './components/Header.vue';
 </script>
 
 <style scoped>
@@ -23,6 +27,6 @@ import SidebarMenu from './components/SidebarMenu.vue';
 
 .router-view {
   grid-area: 'router-view';
-  padding: 1rem;
+  padding: 30px;
 }
 </style>
