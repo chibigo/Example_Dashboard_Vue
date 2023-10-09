@@ -3,7 +3,7 @@ export const routes = [
     {
         path:'/',
         name:'dashboard',
-        component: ()=> import('@/views/DashboardView.vue')
+        component: ()=> import('@/views/DashBoard/index.vue')
     },
     {
         path:'/category',
