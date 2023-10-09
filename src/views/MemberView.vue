@@ -13,6 +13,7 @@
 import { ref, onMounted  } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import { useMemberStore } from '../stores/member.js'
 const member = [
   {
     name: 'test1',
@@ -34,9 +35,17 @@ const member = [
   },
 ]
 
+const members = useMemberStore()
+
 onMounted(() => {
   data.value = member;
 });
+
+onMounted( async () => {
+  await members.getListMember()
+});
+
+
 
 const data = ref()
 
