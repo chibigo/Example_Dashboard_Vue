@@ -7,6 +7,6 @@ export const loginRequest = async data => {
       data
   })
 
-  return res
-} 
+  return res.data
+}
 
