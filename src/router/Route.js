@@ -38,7 +38,10 @@ export const routes = [
     {
         path:'/login',
         name:'login',
-        component: () => import('@/views/Login/index.vue')
+        component: () => import('@/views/Login/index.vue'),
+        meta: {
+            requestAuthen: true,
+        },
     }
 ]
 // export default routes

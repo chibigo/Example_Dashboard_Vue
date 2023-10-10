@@ -31,16 +31,21 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const useAuth = useAuthStore()
+  if (to.meta.requestAuthen) {
+    if (useAuth.auth) {
+      next({ name: "dashboard" });
+    } else next();
+  } else {
     if (to.meta.checkAuth) {
       if (useAuth.auth) {
         next();
       } else {
         next({ name: "login" });
-      };
-    } else{
-     next()
-      
+      }
+    } else {
+      next(); // Cho phép truy cập
     }
+  }
 });
 
 export default router
