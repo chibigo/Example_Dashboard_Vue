@@ -3,12 +3,15 @@ export const routes = [
     {
         path: '/',
         name: '',
-        component: () => import('@/components/Layout/index.vue'),
+        component: () => import('@/components/Layout/index.vue'), 
+        meta: {
+            checkAuth: true,
+        },
         children: [
             {
-                path:'/',
+                path:'',
                 name:'dashboard',
-                component: ()=> import('@/views/DashBoard/index.vue')
+                component: ()=> import('@/views/DashBoard/index.vue'),
             },
             {
                 path:'/category',

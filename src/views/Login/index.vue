@@ -3,16 +3,16 @@
     <div class="content">
       <h1>LOGIN</h1>
       <p>Please login with your Username and Password.</p>
-      <form>
+      <form @submit.prevent="handleLogin">
         <div class="field">
-          <label>Email</label>
-          <InputText type="text" v-model="dataLogin.username" />
+          <label>Username</label>
+          <InputText type="text" v-model="username" required />
         </div>
         <div class="field">
           <label>Password</label>
-          <InputText type="text" v-model="dataLogin.password" />
+          <InputText type="password" v-model="password" required />
         </div>
-        <Button class="button-submit" type="button" label="Submit" :loading="loading" size="small" @click="handleLogin" />
+        <Button class="button-submit" type="submit" label="Submit" size="small" />
       </form>
     </div>
   </section>
@@ -20,19 +20,36 @@
 
 <script setup>
 import {ref} from 'vue'
-import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import { useForm } from "vee-validate";
+import { schema } from "./schema";
+import InputText from 'primevue/inputtext';
+import { useAuthStore } from '../../stores/auth'
 
-const dataLogin = ref({
-  username: '',
-  password: ''
+const login = useAuthStore()
+
+const { handleSubmit, useFieldModel } =
+  useForm({
+    validationSchema: schema,
+    initialValues: {
+      username: "",
+      password: ""
+    },
+  });
+
+const [
+  username,
+  password
+] = useFieldModel([
+  "username",
+  "password"
+]);
+
+const handleLogin = handleSubmit(async (values) => {
+  if(values) {
+    await login.login(values)
+  }
 })
-
-const loading = ref(false)
-
-const handleLogin = () => {
-  loading.value = true
-}
 </script>
 
 <style scoped lang="scss">
