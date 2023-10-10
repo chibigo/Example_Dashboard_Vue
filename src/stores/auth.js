@@ -20,13 +20,14 @@ export const useAuthStore = defineStore('auth', {
         if(!res.success) {
           Swal.fire({
             title: 'Error!',
-            text: res.data.message,
+            text: res.message,
             icon: 'error',
           })
-        }else {
+        } else {
           this.profile = res.data
+          this.auth = res.data.token
           localStorage.setItem("token", res.data.token);
-          router.push({name:'dashboard'})
+          router.push("/")
         }
       }
       catch (err) {
