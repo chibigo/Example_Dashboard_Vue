@@ -1,15 +1,19 @@
 import { defineStore } from 'pinia'
-import { CategoryRequest } from '../api/category'
+import { getListCategoryApi } from '../api/category'
 
 export const useCategoryStore = defineStore('category', {
   state: () => {
     return { list:[] }
   },
-  getters:{},
+  getters:{
+    doubleCount(state) {
+        return state.count * 2
+      },
+  },
   actions: {
     async getListCategory() {;
-      const res = await CategoryRequest()
-      this.list = res.data
+      const res = await getListCategoryApi()
+      this.list = res.data.data
     },
   },
 })
