@@ -31,8 +31,7 @@
           <i class="pi pi-search" />
           <InputText v-model="value1" placeholder="Search" />
         </span>
-        <Dropdown v-model="selectedCity" :options="title" optionLabel="name" placeholder="All"
-          class="w-full md:w-14rem" />
+        <Dropdown v-model="selectedCity" :options="title" optionLabel="name" placeholder="All" class="w-full md:w-14rem" />
         <Button onclick="handleSubmit" class="all-submit" type="submit" label="Submit" severity="success" />
       </form>
     </div>
