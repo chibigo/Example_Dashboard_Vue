@@ -29,10 +29,15 @@ export const routes = [
                 component: () => import('@/views/MemberView.vue')
             },
             {
+                path:'/library',
+                name:'library',
+                component: () => import('@/views/LibaryFile/index.vue')
+            },
+            {
                 path:'/setting',
                 name:'setting',
                 component: () => import('@/views/SettingView.vue')
-            },
+            }
         ]
     },
     {
@@ -42,6 +47,15 @@ export const routes = [
         meta: {
             requestAuthen: true,
         },
+    },
+    {
+        path: '/404',
+        name: 'PageNotFound',
+        component: () => import('../views/Error404.vue')
+      },
+    {
+        path: '/:catchAll(.*)',
+        redirect: '404'
     }
 ]
 // export default routes
