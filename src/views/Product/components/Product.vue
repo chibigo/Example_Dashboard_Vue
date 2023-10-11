@@ -1,43 +1,3 @@
-<script setup>
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import Editor from "primevue/editor";
-import InputNumber from "primevue/inputnumber";
-import Treeselect from 'vue3-treeselect';
-import 'vue3-treeselect/dist/vue3-treeselect.css';
-
-import { ref } from "vue";
-const value = ref("");
-const visible = ref(false);
-
-const options = [
-  {
-    id: '1',
-    label: 'Bia',
-  },
-  {
-    id: '2',
-    label: 'Rượu',
-    children: [
-      {
-        id: '21',
-        label: 'Rượu Hoa Anh Túc',
-      },
-      {
-        id: '22',
-        label: 'Rượu Cần',
-      },
-    ],
-  },
-  {
-    id: '4',
-    label: 'Banh',
-  },
-];
-
-</script>
-
 <template>
   <div class="product">
     <div class="product-add">
@@ -120,11 +80,40 @@ const options = [
 </template>
 <script setup>
 import { ref } from "vue";
-import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import Editor from "primevue/editor";
 import InputNumber from "primevue/inputnumber";
+
+import 'vue3-treeselect/dist/vue3-treeselect.css';
+
+import Button from "primevue/button";
+import Treeselect from 'vue3-treeselect';
+
+const options = [
+  {
+    id: '1',
+    label: 'Bia',
+  },
+  {
+    id: '2',
+    label: 'Rượu',
+    children: [
+      {
+        id: '21',
+        label: 'Rượu Hoa Anh Túc',
+      },
+      {
+        id: '22',
+        label: 'Rượu Cần',
+      },
+    ],
+  },
+  {
+    id: '4',
+    label: 'Banh',
+  },
+];
 
 const value = ref("");
 const visible = ref(false);
