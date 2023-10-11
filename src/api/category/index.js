@@ -1,10 +1,9 @@
 import SSRRequest from "../axios";
 
-export const CategoryRequest = async data => {
+export const getListCategoryApi = async () => {
     const res = await SSRRequest({
-        url: '/admin/category/create',
-        method: 'POST',
-        data
+        url: '/admin/category/list',
+        method: 'GET'
     })
     return res
 }
