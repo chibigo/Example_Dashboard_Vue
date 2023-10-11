@@ -20,7 +20,6 @@ const visible = ref(false);
         icon="pi pi-plus"
       />
     </div>
-    hjkljasjdklajklsjdlals
   </div>
   <Dialog
     v-model:visible="visible"
