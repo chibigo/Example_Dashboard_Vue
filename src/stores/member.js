@@ -9,7 +9,7 @@ export const useMemberStore = defineStore('member', {
   actions: {
     async getListMember() {;
       const res = await getMembersRequest()
-      this.list = res.data
+      this.list = res.data.data
     },
   },
 })

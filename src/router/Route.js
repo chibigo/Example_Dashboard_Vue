@@ -26,7 +26,7 @@ export const routes = [
             {
                 path:'/member',
                 name:'member',
-                component: () => import('@/views/MemberView.vue')
+                component: () => import('@/views/Member/index.vue')
             },
             {
                 path:'/library',
