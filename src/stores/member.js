@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getMembersRequest } from '../api/member'
+import { getMembersRequest, blockDeleteMembersRequest } from '../api/member'
 
 export const useMemberStore = defineStore('member', {
   state: () => {
@@ -7,9 +7,13 @@ export const useMemberStore = defineStore('member', {
   },
   getters:{},
   actions: {
-    async getListMember() {;
+    async getListMember() {
       const res = await getMembersRequest()
-      this.list = res.data
+      this.list = res.data.data
     },
+    async blockDeleteMember(params) {;
+      const res = await blockDeleteMembersRequest(params)
+      await this.getListMember()
+    }
   },
 })
