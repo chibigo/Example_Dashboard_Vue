@@ -1,22 +1,10 @@
 <template>
   <div class="product">
     <div class="product-add">
-      <Button
-        @click="visible = true"
-        rounded
-        type="button"
-        severity="success"
-        label="Add Product"
-        icon="pi pi-plus"
-      />
+      <Button @click="visible = true" rounded type="button" severity="success" label="Add Product" icon="pi pi-plus" />
     </div>
   </div>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="Add Product"
-    :style="{ width: '60vw' }"
-  >
+  <Dialog v-model:visible="visible" modal header="Add Product" :style="{ width: '60vw' }">
     <div class="product-modal-add">
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Code</label>
@@ -33,6 +21,10 @@
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Price</label>
         <InputNumber id="username" aria-describedby="username-help" />
+      </div>
+      <div class="item-add flex flex-column gap-2">
+        <label for="username">Product Price</label>
+        <treeselect :multiple="false" :options="options" />
       </div>
     </div>
     <div class="mt-2">
@@ -88,11 +80,40 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import Editor from "primevue/editor";
 import InputNumber from "primevue/inputnumber";
+
+import 'vue3-treeselect/dist/vue3-treeselect.css';
+
+import Button from "primevue/button";
+import Treeselect from 'vue3-treeselect';
+
+const options = [
+  {
+    id: '1',
+    label: 'Bia',
+  },
+  {
+    id: '2',
+    label: 'Rượu',
+    children: [
+      {
+        id: '21',
+        label: 'Rượu Hoa Anh Túc',
+      },
+      {
+        id: '22',
+        label: 'Rượu Cần',
+      },
+    ],
+  },
+  {
+    id: '4',
+    label: 'Banh',
+  },
+];
 
 const value = ref("");
 const visible = ref(false);
@@ -143,15 +164,18 @@ const removeImage = (index) => {
     justify-content: flex-end;
   }
 }
+
 .product-modal-add {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
+
 .product-btn-add {
   margin-top: 10px;
   display: flex;
   justify-content: end;
+
   button {
     &:first-child {
       margin-right: 10px;
