@@ -6,11 +6,11 @@
       <form @submit.prevent="handleLogin">
         <div class="field">
           <label>Username</label>
-          <InputText type="text" v-model="username" required />
+          <InputText type="text" v-model="username" required autofocus="true" />
         </div>
         <div class="field">
           <label>Password</label>
-          <InputText type="password" v-model="password" required />
+          <InputText type="password" v-model="password" required autocomplete="on" />
         </div>
         <Button class="button-submit" type="submit" label="Submit" size="small" />
       </form>
@@ -102,6 +102,7 @@ p {
   margin: 0 auto;
   background: #4fc08d;
   border: #4fc08d;
+  border-radius: 10px;
 }
 </style>
 
