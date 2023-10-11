@@ -4,11 +4,13 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config';
 import VueSweetalert2 from 'vue-sweetalert2';
-import "primevue/resources/themes/lara-light-indigo/theme.css";
+
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import "primevue/resources/themes/lara-light-indigo/theme.css";
+
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/js/bootstrap.bundle.min";
 
 import App from './App.vue'
 import router from './router'
