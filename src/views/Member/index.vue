@@ -1,5 +1,12 @@
 <template>
-  <div >
+  <div>
+      <div class="wrap-top">
+        <div class="search">search</div>
+        <div class="create">
+          <button>Create Member</button>
+        </div>
+      </div>
+      <div class="table">
         <DataTable :value="members.list" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" tableStyle="min-width: 60rem">
             <Column field="index" header="Number">
               <template #body="slotProps">
@@ -16,15 +23,18 @@
             </Column>
             <Column field="isBlock" header="Status">
               <template #body="slotProps">
-               <InputSwitch v-modal="checked"/>
+               <div>
+                <InputSwitch :modelValue="slotProps.data.isBlock == 0 ? true : false"  @click="handleBlockMember(slotProps.data.username,slotProps.data.name,slotProps.data.isBlock)" />
+               </div>
               </template>
             </Column>
         </DataTable>
+      </div>
     </div>
 </template>
 
 <script setup>
-import { onBeforeMount , ref  } from 'vue';
+import { onBeforeMount } from 'vue';
 import DataTable from 'primevue/datatable';
 import InputSwitch from 'primevue/inputswitch';
 import Column from 'primevue/column';
@@ -33,15 +43,14 @@ import { formatDate } from '../../utils'
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 
 const members = useMemberStore()
-const checked = ref(false);
+
 onBeforeMount( async () => {
   await members.getListMember()
 });
 
-const handleBlockMember = (userName,name) => {
-  console.log(userName)
+const handleBlockMember = (userName,name,status) => {
   Swal.fire({
-    text: `Do you want block ${name}`,
+    text: `Do you want ${status == 0 ? 'block' : 'unblock'} ${name}`,
   }).then( async(result) => {
     await members.blockDeleteMember({username: userName,type: 'BLOCK'})
     if (result.isConfirmed) {
@@ -55,7 +64,12 @@ const handleBlockMember = (userName,name) => {
 </script>
 
 <style lang="scss" scoped>
-
+.wrap-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 </style>
 
 <style>

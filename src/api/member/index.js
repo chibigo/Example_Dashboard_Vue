@@ -15,7 +15,6 @@ export const getMembersRequest = async (params) => {
 
 export const blockDeleteMembersRequest = async(params) => {
   const queryParams = queryString.stringify(params)
-  console.log(`/admin/admin/member/action${params ? '?' : ''}${queryParams}`);
   const res = await SSRRequest({
     url: `/admin/member/action${params ? '?' : ''}${queryParams}`,
     method: 'GET',
