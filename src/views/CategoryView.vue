@@ -1,34 +1,40 @@
 <template>
   <div class="category">
-    <div @click="handleOnclick" class="create-table">
-      <Button label="Create Member" severity="success" raised />
-      <div class="popup">
-        <div class="input-user">
-          <label for="username" class="">Username</label>
-          <InputText id="username" placeholder="Username" class="p-invalid" />
-          <!-- <InlineMessage>Username is required</InlineMessage> -->
-        </div>
-        <div class="nameCategory">
-          <label class="">nameCategory</label>
-          <treeselect v-model="value" :multiple="false" :options="options" />
-        </div>
-        <div class="description">
-          <Textarea v-model="value" rows="5" cols="30" />
-        </div>
-        <div class="btn-group">
-          <Button label="Create" severity="success" rounded />
-          <Button label="Cancel" severity="secondary" rounded />
-        </div>
+    <div class="create-table">
+      <Button @click="handleOnclick" label="Create Member" severity="success" raised />
+      <div v-if="onpenPopup" class="popup">
+        <form @submit="onSubmit">
+          <div class="input-user">
+            <label for="username" class="">Username</label>
+            <InputText id="username" placeholder="Username" />
+            <!-- <InlineMessage>Username is required</InlineMessage> -->
+          </div>
+          <div class="nameCategory">
+            <label class="">nameCategory</label>
+            <treeselect :multiple="false" :options="options" />
+          </div>
+          <div class="description">
+            <label>description</label>
+            <Textarea rows="5" cols="30" />
+          </div>
+          <div class="btn-group">
+            <Button type="submit" label="Create" severity="success" rounded />
+            <Button @click="onpenPopup = false" label="Cancel" severity="secondary" rounded />
+          </div>
+        </form>
       </div>
-      <div class="overlay"></div>
+      <div v-if="onpenPopup" class="overlay"></div>
     </div>
-    <div class="d-flex mb-5 ">
-      <span class="p-float-label">
-        <!-- <InputText id="username" v-model="value" /> -->
-        <label for="username">Username</label>
-      </span>
-      <Dropdown v-model="selectedCity" :options="title" optionLabel="name" placeholder="All" class="w-full md:w-14rem" />
-      <Button onclick="handleSubmit" class="all-submit" type="submit" label="Success" severity="success" />
+    <div class="form-search">
+      <form @submit="onSubmit">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" />
+          <InputText v-model="value1" placeholder="Search" />
+        </span>
+        <Dropdown v-model="selectedCity" :options="title" optionLabel="name" placeholder="All"
+          class="w-full md:w-14rem" />
+        <Button onclick="handleSubmit" class="all-submit" type="submit" label="Submit" severity="success" />
+      </form>
     </div>
     <div class="table">
       <TreeTable :value="dataTable" paginator :rows="10" :rowsPerPageOptions="[2, 10, 20, 50]"
@@ -154,61 +160,79 @@ onMounted(async () => {
 });
 
 const dataTable = ref()
+const onpenPopup = ref(false)
 
-const handleOnclick = (e) => {
-  e.target.classList.add("active");
+const handleOnclick = () => {
+  onpenPopup.value = !onpenPopup.value;
 }
 
 </script>
 
 <style lang="scss" scoped>
-.category {
+#app {
   position: relative;
+}
+
+.category {
   .create-table {
-    // position: relative;
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
+    display: flex;
+    justify-content: flex-end;
 
     .popup {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: auto;
+      width: 300px;
       height: auto;
-      display: none;
       flex-direction: column;
       justify-content: center;
       background-color: #fff;
       padding: 2rem;
+      display: flex;
       border-radius: 8px;
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
       z-index: 999;
 
-      .input-user{
+      .input-user,
+      .nameCategory,
+      .description {
         display: flex;
         flex-direction: column;
+        margin-bottom: 1rem;
       }
-    }
 
-    &.active .popup,
-    &.active .overlay {
-      display: flex;
+      .btn-group {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+      }
     }
 
     .overlay {
       position: absolute;
+      top: 0;
+      left: 0;
       background-color: #000;
       width: 100vw;
       height: 100vh;
       opacity: .3;
       z-index: 998;
-      display: none;
+      display: block;
+    }
+
+  }
+
+  .form-search {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+
+    .p-input-icon-left,
+    .p-dropdown {
+      margin-right: 1rem;
     }
   }
 }
 </style>
-
-//create name,image, description,
 
