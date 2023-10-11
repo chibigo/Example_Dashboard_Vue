@@ -1,17 +1,26 @@
 <template>
   <div class="category">
-    <div class="create-table">
+    <div @click="handleOnclick" class="create-table">
       <Button label="Create Member" severity="success" raised />
       <div class="popup">
-        <div class="flex flex-wrap align-items-center mb-3 gap-2">
-          <label for="username" class="p-sr-only">Username</label>
+        <div class="input-user">
+          <label for="username" class="">Username</label>
           <InputText id="username" placeholder="Username" class="p-invalid" />
           <!-- <InlineMessage>Username is required</InlineMessage> -->
         </div>
-        <div id="app">
-          <treeselect v-model="value" :multiple="true" :options="options" />
+        <div class="nameCategory">
+          <label class="">nameCategory</label>
+          <treeselect v-model="value" :multiple="false" :options="options" />
+        </div>
+        <div class="description">
+          <Textarea v-model="value" rows="5" cols="30" />
+        </div>
+        <div class="btn-group">
+          <Button label="Create" severity="success" rounded />
+          <Button label="Cancel" severity="secondary" rounded />
         </div>
       </div>
+      <div class="overlay"></div>
     </div>
     <div class="d-flex mb-5 ">
       <span class="p-float-label">
@@ -50,6 +59,8 @@ import { useCategoryStore } from '../stores/category.js';
 import { formatDate } from "../utils/index";
 import Treeselect from 'vue3-treeselect';
 import 'vue3-treeselect/dist/vue3-treeselect.css';
+import Textarea from 'primevue/textarea';
+
 const selectedCity = ref();
 const title = ref([
   { name: 'All' },
@@ -57,12 +68,30 @@ const title = ref([
   { name: 'Action' },
 ])
 
-const datapopup = [
+const options = [
   {
-    title: "Username",
-    description: ""
-  }
-]
+    id: '1',
+    label: 'Bia',
+  },
+  {
+    id: '2',
+    label: 'Rượu',
+    children: [
+      {
+        id: '21',
+        label: 'Rượu Hoa Anh Túc',
+      },
+      {
+        id: '22',
+        label: 'Rượu Cần',
+      },
+    ],
+  },
+  {
+    id: '4',
+    label: 'Banh',
+  },
+];
 
 const handleSubmit = () => { }
 
@@ -126,14 +155,59 @@ onMounted(async () => {
 
 const dataTable = ref()
 
+const handleOnclick = (e) => {
+  e.target.classList.add("active");
+}
+
 </script>
 
 <style lang="scss" scoped>
-// .category {
-//   .create-table {
-//     float: right;
-//   }
-// }
+.category {
+  position: relative;
+  .create-table {
+    // position: relative;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
+
+    .popup {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      height: auto;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      z-index: 999;
+
+      .input-user{
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    &.active .popup,
+    &.active .overlay {
+      display: flex;
+    }
+
+    .overlay {
+      position: absolute;
+      background-color: #000;
+      width: 100vw;
+      height: 100vh;
+      opacity: .3;
+      z-index: 998;
+      display: none;
+    }
+  }
+}
 </style>
 
 //create name,image, description,
