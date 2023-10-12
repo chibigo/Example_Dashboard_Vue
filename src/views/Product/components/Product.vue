@@ -1,17 +1,17 @@
 <script setup>
-import { ref } from "vue";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import Editor from "primevue/editor";
-import InputNumber from "primevue/inputnumber";
-import "vue3-treeselect/dist/vue3-treeselect.css";
-import Button from "primevue/button";
-import Treeselect from "vue3-treeselect";
-import { updateImage } from "@/api/uploadFile";
-import { createProduct } from "@/api/product";
-import { useProductStore } from "@/stores/product";
+import { onMounted, ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
+import Editor from 'primevue/editor'
+import InputNumber from 'primevue/inputnumber'
+import 'vue3-treeselect/dist/vue3-treeselect.css'
+import Button from 'primevue/button'
+import Treeselect from 'vue3-treeselect'
+import { updateImage } from '@/api/uploadFile'
+import { createProduct } from '@/api/product'
+import { useProductStore } from '@/stores/product'
 
 // const options = ref([
 //   {
@@ -37,68 +37,71 @@ import { useProductStore } from "@/stores/product";
 //     label: "Banh",
 //   },
 // ]);
-const useProduct = useProductStore();
+const useProduct = useProductStore()
 
-const value = ref("");
-const visible = ref(false);
-const images = ref([]);
-const filesData = ref([]);
+const value = ref('')
+const visible = ref(false)
+const images = ref([])
+const filesData = ref([])
 
 const dataProductCreate = ref({
-  productCode: "",
-  productName: "",
-  productUnit: "",
-  productImage: "",
-  description: "",
+  productCode: '',
+  productName: '',
+  productUnit: '',
+  productImage: '',
+  description: '',
   categoryId: [],
-  productPrice: 0,
-});
+  productPrice: 0
+})
 
-await useProduct.getListProductAction();
+onMounted(() => {
+  useProduct.getListProductAction()
+})
 
-const onDragOver = (event) => {
-  event.preventDefault();
-};
+const onDragOver = event => {
+  event.preventDefault()
+}
 
-const handleFileUpload = (event) => {
-  const files = event.target.files;
-  processFiles(files);
-};
+const handleFileUpload = event => {
+  const files = event.target.files
+  processFiles(files)
+}
 
-let formdata = new FormData();
+let formdata = new FormData()
 
-const handleFileDrop = (event) => {
-  event.preventDefault();
-  formdata.append("file", event.target.files);
-  const files = event.dataTransfer.files;
-  processFiles(files);
-};
+const handleFileDrop = event => {
+  event.preventDefault()
+  formdata.append('file', event.target.files)
+  const files = event.dataTransfer.files
+  processFiles(files)
+}
 
-const processFiles = (files) => {
-  filesData.value = files;
+const processFiles = files => {
+  filesData.value = files
   for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    const file = files[i]
+    const reader = new FileReader()
+    reader.onload = e => {
       images.value.push({
         name: file.name,
         url: e.target.result,
         type: file.type,
-        isSuccess: false,
-      });
-    };
-    reader.readAsDataURL(file);
+        isSuccess: false
+      })
+    }
+    reader.readAsDataURL(file)
   }
-};
+}
 
-const removeImage = (index) => {
-  images.value.splice(index, 1);
-};
+const removeImage = index => {
+  images.value.splice(index, 1)
+}
+
 const handleCreateProduct = async () => {
-  await createProduct(dataProductCreate.value).then(async (res) => {
-    await useProduct.getListProductAction();
-  });
-};
+  await createProduct(dataProductCreate.value).then(async res => {
+    await useProduct.getListProductAction()
+  })
+}
 </script>
 
 <template>
@@ -167,10 +170,6 @@ const handleCreateProduct = async () => {
           aria-describedby="username-help"
         />
       </div>
-      <!--      <div class="item-add flex flex-column gap-2">-->
-      <!--        <label for="username">Product Price</label>-->
-      <!--        <treeselect :multiple="true" :options="options" />-->
-      <!--      </div>-->
     </div>
     <div class="mt-2">
       <span class="mb-2">Description</span>
