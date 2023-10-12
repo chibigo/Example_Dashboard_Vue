@@ -3,41 +3,41 @@ import { loginRequest } from '../api/login'
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 import router from '../router'
 
-
-
 export const useAuthStore = defineStore('auth', {
   state: () => {
     return {
-      auth: localStorage.getItem("token") ? localStorage.getItem("token") : null, 
-      profile: {} 
+      auth: localStorage.getItem('token')
+        ? localStorage.getItem('token')
+        : null,
+      profile: {}
     }
   },
-  getters:{},
+  getters: {},
   actions: {
     async login(data) {
       try {
         const res = await loginRequest(data)
-        if(!res.success) {
+        if (!res.success) {
           Swal.fire({
             title: 'Error!',
             text: res.message,
-            icon: 'error',
+            icon: 'error'
           })
         } else {
           this.profile = res.data
           this.auth = res.data.token
-          localStorage.setItem("token", res.data.token);
-          router.push("/")
+          localStorage.setItem('token', res.data.token)
+          router.push('/')
+          location.reload()
         }
-      }
-      catch (err) {
+      } catch (err) {
         Swal.fire({
           title: 'Error!',
           text: err,
-          icon: 'error',
+          icon: 'error'
         })
       }
-    },
+    }
   },
 
   logout() {
