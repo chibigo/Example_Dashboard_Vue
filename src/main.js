@@ -6,11 +6,10 @@ import PrimeVue from "primevue/config";
 import VueSweetalert2 from "vue-sweetalert2";
 import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "sweetalert2/dist/sweetalert2.min.css";
-import "primeflex/primeflex.scss";
 
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap/dist/js/bootstrap.bundle.min";
-
+import "primeflex/primeflex.scss";
 import App from "./App.vue";
 import router from "./router";
 
