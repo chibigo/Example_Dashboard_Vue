@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onBeforeMount } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
@@ -12,6 +12,8 @@ import Treeselect from 'vue3-treeselect'
 import { updateImage } from '@/api/uploadFile'
 import { createProduct } from '@/api/product'
 import { useProductStore } from '@/stores/product'
+import MultiSelect from 'primevue/multiselect'
+import { useCategoryStore } from '@/stores/category'
 
 // const options = ref([
 //   {
@@ -38,11 +40,13 @@ import { useProductStore } from '@/stores/product'
 //   },
 // ]);
 const useProduct = useProductStore()
-
+const useCategory = useCategoryStore()
 const value = ref('')
 const visible = ref(false)
 const images = ref([])
 const filesData = ref([])
+const optionCategory = ref([])
+const selectCategory = ref()
 
 const dataProductCreate = ref({
   productCode: '',
@@ -54,8 +58,19 @@ const dataProductCreate = ref({
   productPrice: 0
 })
 
-onMounted(() => {
-  useProduct.getListProductAction()
+onBeforeMount(async () => {
+  await useProduct.getListProductAction()
+  await useCategory.getListCategory()
+  const customCategory = []
+
+  useCategory.list.map(item => {
+    customCategory.push({
+      name: item?.data?.nameCategory,
+      idCategory: item?.data?.id
+    })
+  })
+
+  optionCategory.value = customCategory
 })
 
 const onDragOver = event => {
@@ -98,8 +113,17 @@ const removeImage = index => {
 }
 
 const handleCreateProduct = async () => {
-  await createProduct(dataProductCreate.value).then(async res => {
-    await useProduct.getListProductAction()
+  const idCategories = []
+
+  selectCategory.value.map(id => {
+    idCategories.push(id.idCategory)
+  })
+
+  visible.value = false
+
+  await useProduct.createProductAction({
+    ...dataProductCreate.value,
+    categoryId: idCategories
   })
 }
 </script>
@@ -126,8 +150,18 @@ const handleCreateProduct = async () => {
       >
         <Column field="productCode" header="Product Code"></Column>
         <Column field="productName" header="Product Name"></Column>
+        <Column field="categories" header="Category">
+          <template #body="slotProps">
+            <div>
+              <p v-for="val in slotProps.data.categories">
+                {{ val.nameCategory }}
+              </p>
+            </div>
+          </template></Column
+        >
         <Column field="productUnit" header="Unit"></Column>
         <Column field="productPrice" header="Price"></Column>
+        <Column field="productPrice" header="Action"></Column>
       </DataTable>
     </div>
   </div>
@@ -170,12 +204,23 @@ const handleCreateProduct = async () => {
           aria-describedby="username-help"
         />
       </div>
+      <div class="item-add flex flex-column gap-2">
+        <label for="username">Category</label>
+        <MultiSelect
+          v-model="selectCategory"
+          display="chip"
+          :options="optionCategory"
+          optionLabel="name"
+          placeholder="Select Category"
+          :maxSelectedLabels="3"
+        />
+      </div>
     </div>
     <div class="mt-2">
       <span class="mb-2">Description</span>
       <Editor
         v-model="dataProductCreate.description"
-        editorStyle="height: 320px"
+        editorStyle="height: 200px"
       />
     </div>
     <div class="mt-2">
