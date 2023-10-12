@@ -1,5 +1,5 @@
 <template>
-  <RouterView class="router-view"/>
+  <RouterView class="router-view" />
 </template>
 <script setup>
 import { RouterView } from 'vue-router'
@@ -10,5 +10,10 @@ import { RouterView } from 'vue-router'
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+</style>
+<style>
+.p-overflow-hidden {
+  --scrollbar-width: 0px !important;
 }
 </style>
