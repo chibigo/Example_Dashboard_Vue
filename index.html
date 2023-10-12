@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vite App</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
 
 <style>
@@ -17,5 +20,22 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  /* css action */
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: #4fc08d;
+  }
+
+  .p-inputswitch.p-focus .p-inputswitch-slider {
+    box-shadow: none;
+  }
+
+  div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm:focus {
+    box-shadow: none;
+  }
+
+  div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+    background: #4fc08d;
   }
 </style>
