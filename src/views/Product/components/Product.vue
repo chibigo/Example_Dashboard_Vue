@@ -1,40 +1,187 @@
+<script setup>
+import { ref } from "vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
+import Editor from "primevue/editor";
+import InputNumber from "primevue/inputnumber";
+import "vue3-treeselect/dist/vue3-treeselect.css";
+import Button from "primevue/button";
+import Treeselect from "vue3-treeselect";
+import { updateImage } from "@/api/uploadFile";
+import { createProduct } from "@/api/product";
+import { useProductStore } from "@/stores/product";
+
+// const options = ref([
+//   {
+//     id: "1",
+//     label: "Bia",
+//   },
+//   {
+//     id: "2",
+//     label: "Rượu",
+//     children: [
+//       {
+//         id: "21",
+//         label: "Rượu Hoa Anh Túc",
+//       },
+//       {
+//         id: "22",
+//         label: "Rượu Cần",
+//       },
+//     ],
+//   },
+//   {
+//     id: "4",
+//     label: "Banh",
+//   },
+// ]);
+const useProduct = useProductStore();
+
+const value = ref("");
+const visible = ref(false);
+const images = ref([]);
+const filesData = ref([]);
+
+const dataProductCreate = ref({
+  productCode: "",
+  productName: "",
+  productUnit: "",
+  productImage: "",
+  description: "",
+  categoryId: [],
+  productPrice: 0,
+});
+
+const onDragOver = (event) => {
+  event.preventDefault();
+};
+
+const handleFileUpload = (event) => {
+  const files = event.target.files;
+  processFiles(files);
+};
+
+let formdata = new FormData();
+
+const handleFileDrop = (event) => {
+  event.preventDefault();
+  formdata.append("file", event.target.files);
+  const files = event.dataTransfer.files;
+  processFiles(files);
+};
+
+const processFiles = (files) => {
+  filesData.value = files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      images.value.push({
+        name: file.name,
+        url: e.target.result,
+        type: file.type,
+        isSuccess: false,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const removeImage = (index) => {
+  images.value.splice(index, 1);
+};
+
+const handleCreateProduct = async () => {
+  await createProduct(dataProductCreate.value).then(async (res) => {
+    await useProduct.getListProductAction();
+  });
+};
+</script>
+
 <template>
   <div class="product">
     <div class="product-add">
-      <Button @click="visible = true" rounded type="button" severity="success" label="Add Product" icon="pi pi-plus" />
+      <Button
+        @click="visible = true"
+        rounded
+        type="button"
+        severity="success"
+        label="Add Product"
+        icon="pi pi-plus"
+      />
+    </div>
+    <div class="mt-3">
+      <DataTable
+        paginator
+        :rows="10"
+        :value="useProduct.listProduct"
+        showGridlines
+        tableStyle="min-width: 50rem"
+      >
+        <Column field="productCode" header="Product Code"></Column>
+        <Column field="productName" header="Product Name"></Column>
+        <Column field="productUnit" header="Unit"></Column>
+        <Column field="productPrice" header="Price"></Column>
+      </DataTable>
     </div>
   </div>
-  <Dialog v-model:visible="visible" modal header="Add Product" :style="{ width: '60vw' }">
-    <div class="product-modal-add">
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Add Product"
+    :style="{ width: '60vw' }"
+  >
+    <div class="product-modal-add mb-3">
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Code</label>
-        <InputText id="username" aria-describedby="username-help" />
+        <InputText
+          id="username"
+          v-model="dataProductCreate.productCode"
+          aria-describedby="username-help"
+        />
       </div>
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Name</label>
-        <InputText id="username" aria-describedby="username-help" />
+        <InputText
+          id="username"
+          v-model="dataProductCreate.productName"
+          aria-describedby="username-help"
+        />
       </div>
       <div class="item-add flex flex-column gap-2">
         <label for="username">Unit</label>
-        <InputText id="username" aria-describedby="username-help" />
+        <InputText
+          id="username"
+          v-model="dataProductCreate.productUnit"
+          aria-describedby="username-help"
+        />
       </div>
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Price</label>
-        <InputNumber id="username" aria-describedby="username-help" />
+        <InputNumber
+          id="username"
+          v-model="dataProductCreate.productPrice"
+          aria-describedby="username-help"
+        />
       </div>
-      <div class="item-add flex flex-column gap-2">
-        <label for="username">Product Price</label>
-        <treeselect :multiple="false" :options="options" />
-      </div>
+      <!--      <div class="item-add flex flex-column gap-2">-->
+      <!--        <label for="username">Product Price</label>-->
+      <!--        <treeselect :multiple="true" :options="options" />-->
+      <!--      </div>-->
     </div>
     <div class="mt-2">
       <span class="mb-2">Description</span>
-      <Editor v-model="value" editorStyle="height: 320px" />
+      <Editor
+        v-model="dataProductCreate.description"
+        editorStyle="height: 320px"
+      />
     </div>
     <div class="mt-2">
       <span class="mb-2">Product Image</span>
       <div
-        class="dropzone"
+        class="dropzone mt-2"
         @dragover.prevent="onDragOver"
         @drop.prevent="handleFileDrop"
       >
@@ -73,88 +220,12 @@
       </div>
     </div>
     <div class="product-btn-add">
-      <Button label="Create" severity="success" />
+      <Button @click="handleCreateProduct" label="Create" severity="success" />
       <Button @click="visible = false" label="Cancel" severity="secondary" />
     </div>
   </Dialog>
 </template>
-<script setup>
-import { ref } from "vue";
-import Dialog from "primevue/dialog";
-import InputText from "primevue/inputtext";
-import Editor from "primevue/editor";
-import InputNumber from "primevue/inputnumber";
 
-import 'vue3-treeselect/dist/vue3-treeselect.css';
-
-import Button from "primevue/button";
-import Treeselect from 'vue3-treeselect';
-
-const options = [
-  {
-    id: '1',
-    label: 'Bia',
-  },
-  {
-    id: '2',
-    label: 'Rượu',
-    children: [
-      {
-        id: '21',
-        label: 'Rượu Hoa Anh Túc',
-      },
-      {
-        id: '22',
-        label: 'Rượu Cần',
-      },
-    ],
-  },
-  {
-    id: '4',
-    label: 'Banh',
-  },
-];
-
-const value = ref("");
-const visible = ref(false);
-const images = ref([]);
-
-const onDragOver = (event) => {
-  event.preventDefault();
-};
-
-const handleFileUpload = (event) => {
-  const files = event.target.files;
-  processFiles(files);
-};
-
-const handleFileDrop = (event) => {
-  event.preventDefault();
-  const files = event.dataTransfer.files;
-  processFiles(files);
-};
-
-const processFiles = (files) => {
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      images.value.push({
-        name: file.name,
-        url: e.target.result,
-        isSuccess: false,
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
-const removeImage = (index) => {
-  images.value.splice(index, 1);
-};
-
-</script>
 <style scoped lang="scss">
 .product-main {
   width: 100%;
