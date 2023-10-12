@@ -54,6 +54,8 @@ const dataProductCreate = ref({
   productPrice: 0,
 });
 
+await useProduct.getListProductAction();
+
 const onDragOver = (event) => {
   event.preventDefault();
 };
@@ -92,7 +94,6 @@ const processFiles = (files) => {
 const removeImage = (index) => {
   images.value.splice(index, 1);
 };
-
 const handleCreateProduct = async () => {
   await createProduct(dataProductCreate.value).then(async (res) => {
     await useProduct.getListProductAction();
