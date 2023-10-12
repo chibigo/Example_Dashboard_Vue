@@ -12,8 +12,8 @@ export const useMemberStore = defineStore('member', {
   },
   getters: {},
   actions: {
-    async getListMember() {
-      const res = await getMembersRequest()
+    async getListMember(data) {
+      const res = await getMembersRequest(data)
       this.list = res.data.data
     },
     async blockDeleteMember(params) {

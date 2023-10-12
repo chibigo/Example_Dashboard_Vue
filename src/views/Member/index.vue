@@ -2,7 +2,24 @@
   <div>
     <div class="member-main">
       <div class="wrap-top">
-        <div class="search">search</div>
+        <div class="search-wrap">
+          <div class="search">
+            <InputText v-model="valueSearch" placeholder="Search" />
+            <Dropdown
+              v-model="selectedStatus"
+              :options="status"
+              optionLabel="name"
+              placeholder="Status"
+              class="w-full md:w-8rem"
+            />
+            <Button
+              label="Search"
+              severity="success"
+              type="button"
+              @click="handleSearch"
+            />
+          </div>
+        </div>
         <div class="create">
           <Button
             @click="visible = true"
@@ -112,9 +129,21 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import { schema } from './schema'
 import { useForm } from 'vee-validate'
+import Dropdown from 'primevue/dropdown'
+import router from '../../router'
 
 const visible = ref(false)
 const members = useMemberStore()
+const status = ref([
+  { name: 'All', code: undefined },
+  { name: 'Active', code: 0 },
+  { name: 'Block', code: 1 }
+])
+const filterSelect = status.value.find(
+  item => item.code == router.currentRoute.value.query.isBlock
+)
+const selectedStatus = ref(filterSelect || null)
+const valueSearch = ref(router.currentRoute.value.query.textSearch || null)
 
 const { handleSubmit, useFieldModel, errors, resetForm } = useForm({
   validationSchema: schema
@@ -129,7 +158,7 @@ const [username, password, phone, email, name] = useFieldModel([
 ])
 
 onBeforeMount(async () => {
-  await members.getListMember()
+  await members.getListMember(router.currentRoute.value.query || null)
 })
 
 const handleBlockMember = (userName, name, status) => {
@@ -150,6 +179,21 @@ const handleCreateMember = handleSubmit(async values => {
   resetForm()
   await members.actionCreateMember(values)
 })
+
+const handleSearch = async () => {
+  const params = {
+    isBlock: selectedStatus?.value?.code,
+    textSearch: valueSearch?.value ? valueSearch?.value : undefined
+  }
+  await members.getListMember(params)
+  router.push({
+    name: 'member',
+    query: {
+      isBlock: selectedStatus?.value?.code,
+      textSearch: valueSearch?.value ? valueSearch?.value : undefined
+    }
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -166,6 +210,18 @@ const handleCreateMember = handleSubmit(async values => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+
+  position: relative;
+}
+
+.create {
+  position: absolute;
+  right: 0;
+}
+
+.search {
+  display: flex;
+  gap: 10px;
 }
 
 .member-modal-add {
@@ -181,6 +237,12 @@ const handleCreateMember = handleSubmit(async values => {
     &:first-child {
       margin-right: 10px;
     }
+  }
+}
+
+@media (max-width: 1023px) {
+  .search {
+    flex-direction: column;
   }
 }
 </style>
