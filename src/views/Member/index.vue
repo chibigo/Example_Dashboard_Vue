@@ -246,21 +246,3 @@ const handleSearch = async () => {
   }
 }
 </style>
-
-<style>
-.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
-  background: #4fc08d;
-}
-
-.p-inputswitch.p-focus .p-inputswitch-slider {
-  box-shadow: none;
-}
-
-div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm:focus {
-  box-shadow: none;
-}
-
-div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
-  background: #4fc08d;
-}
-</style>
