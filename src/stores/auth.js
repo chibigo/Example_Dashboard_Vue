@@ -1,14 +1,12 @@
-import { defineStore } from 'pinia'
-import { loginRequest } from '../api/login'
-import Swal from 'sweetalert2/dist/sweetalert2.js'
-import router from '../router'
+import { defineStore } from "pinia";
+import { loginRequest } from "../api/login";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import router from "../router";
 
 export const useAuthStore = defineStore('auth', {
   state: () => {
     return {
-      auth: localStorage.getItem('token')
-        ? localStorage.getItem('token')
-        : null,
+      auth: null,
       profile: {}
     }
   },
@@ -19,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
         const res = await loginRequest(data)
         if (!res.success) {
           Swal.fire({
-            title: 'Error!',
+            title: "Error!",
             text: res.message,
             icon: 'error'
           })
@@ -32,16 +30,20 @@ export const useAuthStore = defineStore('auth', {
         }
       } catch (err) {
         Swal.fire({
-          title: 'Error!',
+          title: "Error!",
           text: err,
           icon: 'error'
         })
       }
-    }
-  },
+    },
 
-  logout() {
-    this.auth = false
-    localStorage.clear()
-  }
-})
+    logout() {
+      localStorage.removeItem("token");
+      this.profile = {};
+      this.auth = null;
+      router.push("/login");
+      location.reload();
+    },
+  },
+  persist: true,
+});
