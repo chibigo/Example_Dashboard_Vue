@@ -1,14 +1,18 @@
 import { defineStore } from 'pinia'
-import { createCategory, getListCategoryApi, blockDeleteCategoryRequest  } from '../api/category'
+import {
+  createCategory,
+  getListCategoryApi,
+  blockDeleteCategoryRequest
+} from '../api/category'
 import Swal from 'sweetalert2/dist/sweetalert2.js'
 
 export const useCategoryStore = defineStore('category', {
   state: () => {
-    return { list:[] }
+    return { list: [] }
   },
-  getters:{},
+  getters: {},
   actions: {
-    async getListCategory() {;
+    async getListCategory() {
       const res = await getListCategoryApi()
       this.list = res.data.data
     },
@@ -35,5 +39,5 @@ export const useCategoryStore = defineStore('category', {
         })
       }
     }
-  },
+  }
 })
