@@ -1,8 +1,8 @@
 <script setup>
-import TabView from "primevue/tabview";
-import TabPanel from "primevue/tabpanel";
-import ProductSkuPrice from "@/views/Product/components/ProductSkuPrice.vue";
-import Product from "@/views/Product/components/Product.vue";
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import ProductSkuPrice from '@/views/Product/components/ProductSkuPrice.vue'
+import Product from '@/views/Product/components/Product.vue'
 </script>
 
 <template>
