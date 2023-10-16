@@ -1,36 +1,43 @@
-import { defineStore } from 'pinia'
-import { getListProduct, createProduct } from '@/api/product'
-import Swal from 'sweetalert2/dist/sweetalert2.js'
+import { defineStore } from "pinia";
+import { getListProduct, createProduct } from "@/api/product";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
-export const useProductStore = defineStore('product', {
+export const useProductStore = defineStore("product", {
   state: () => {
-    return { listProduct: [] }
+    return { listProduct: [], loading: false };
   },
   getters: {},
   actions: {
     async getListProductAction() {
-      const res = await getListProduct()
-      this.listProduct = res.data.data
+      try {
+        this.loading = true;
+        const res = await getListProduct();
+        if (res.success) {
+          this.listProduct = res.data;
+        } else {
+          this.listProduct = [];
+        }
+        this.loading = false;
+      } catch (e) {}
     },
     async createProductAction(data) {
       try {
-        const res = await createProduct(data)
-        console.log(123)
+        const res = await createProduct(data);
         Swal.fire({
-          position: 'center',
-          icon: 'success',
+          position: "center",
+          icon: "success",
           title: res.message,
           showConfirmButton: false,
-          timer: 1500
-        })
-        await this.getListProductAction()
+          timer: 1500,
+        });
+        await this.getListProductAction();
       } catch (err) {
         Swal.fire({
-          title: 'Error!',
+          title: "Error!",
           text: err,
-          icon: 'error'
-        })
+          icon: "error",
+        });
       }
-    }
-  }
-})
+    },
+  },
+});

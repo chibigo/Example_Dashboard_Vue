@@ -1,131 +1,108 @@
 <script setup>
-import { onMounted, ref, onBeforeMount } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Editor from 'primevue/editor'
-import InputNumber from 'primevue/inputnumber'
-import 'vue3-treeselect/dist/vue3-treeselect.css'
-import Button from 'primevue/button'
-import Treeselect from 'vue3-treeselect'
-import { updateImage } from '@/api/uploadFile'
-import { createProduct } from '@/api/product'
-import { useProductStore } from '@/stores/product'
-import MultiSelect from 'primevue/multiselect'
-import { useCategoryStore } from '@/stores/category'
+import { ref, onBeforeMount, onUnmounted } from "vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Tag from "primevue/tag";
+import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
+import Editor from "primevue/editor";
+import InputNumber from "primevue/inputnumber";
+import "vue3-treeselect/dist/vue3-treeselect.css";
+import Button from "primevue/button";
+import { useProductStore } from "@/stores/product";
+import MultiSelect from "primevue/multiselect";
+import { useCategoryStore } from "@/stores/category";
 
-// const options = ref([
-//   {
-//     id: "1",
-//     label: "Bia",
-//   },
-//   {
-//     id: "2",
-//     label: "Rượu",
-//     children: [
-//       {
-//         id: "21",
-//         label: "Rượu Hoa Anh Túc",
-//       },
-//       {
-//         id: "22",
-//         label: "Rượu Cần",
-//       },
-//     ],
-//   },
-//   {
-//     id: "4",
-//     label: "Banh",
-//   },
-// ]);
-const useProduct = useProductStore()
-const useCategory = useCategoryStore()
-const value = ref('')
-const visible = ref(false)
-const images = ref([])
-const filesData = ref([])
-const optionCategory = ref([])
-const selectCategory = ref()
+const useProduct = useProductStore();
+const useCategory = useCategoryStore();
+const visible = ref(false);
+const images = ref([]);
+const filesData = ref([]);
+const optionCategory = ref([]);
+const selectCategory = ref();
 
 const dataProductCreate = ref({
-  productCode: '',
-  productName: '',
-  productUnit: '',
-  productImage: '',
-  description: '',
+  productCode: "",
+  productName: "",
+  productUnit: "",
+  productImage: "",
+  description: "",
   categoryId: [],
-  productPrice: 0
-})
+  productPrice: 0,
+});
+
+onUnmounted(() => {
+  useProduct.listProduct = [];
+});
 
 onBeforeMount(async () => {
-  await useProduct.getListProductAction()
-  await useCategory.getListCategory()
-  const customCategory = []
+  await useProduct.getListProductAction();
+  await useCategory.getListCategory();
+  const customCategory = [];
 
-  useCategory.list.map(item => {
+  useCategory.list.map((item) => {
     customCategory.push({
       name: item?.data?.nameCategory,
-      idCategory: item?.data?.id
-    })
-  })
+      idCategory: item?.data?.id,
+    });
+  });
 
-  optionCategory.value = customCategory
-})
+  optionCategory.value = customCategory;
+});
 
-const onDragOver = event => {
-  event.preventDefault()
-}
+const onDragOver = (event) => {
+  event.preventDefault();
+};
 
-const handleFileUpload = event => {
-  const files = event.target.files
-  processFiles(files)
-}
+const handleFileUpload = (event) => {
+  const files = event.target.files;
+  processFiles(files);
+};
 
-let formdata = new FormData()
+let formdata = new FormData();
 
-const handleFileDrop = event => {
-  event.preventDefault()
-  formdata.append('file', event.target.files)
-  const files = event.dataTransfer.files
-  processFiles(files)
-}
+const handleFileDrop = (event) => {
+  event.preventDefault();
+  formdata.append("file", event.target.files);
+  const files = event.dataTransfer.files;
+  processFiles(files);
+};
 
-const processFiles = files => {
-  filesData.value = files
+const processFiles = (files) => {
+  filesData.value = files;
   for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    const reader = new FileReader()
-    reader.onload = e => {
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = (e) => {
       images.value.push({
         name: file.name,
         url: e.target.result,
         type: file.type,
-        isSuccess: false
-      })
-    }
-    reader.readAsDataURL(file)
+        isSuccess: false,
+      });
+    };
+    reader.readAsDataURL(file);
   }
-}
+};
 
-const removeImage = index => {
-  images.value.splice(index, 1)
-}
+const removeImage = (index) => {
+  images.value.splice(index, 1);
+};
 
 const handleCreateProduct = async () => {
-  const idCategories = []
+  const idCategories = [];
 
-  selectCategory.value.map(id => {
-    idCategories.push(id.idCategory)
-  })
+  selectCategory.value.map((id) => {
+    idCategories.push(id.idCategory);
+  });
 
-  visible.value = false
+  visible.value = false;
 
   await useProduct.createProductAction({
     ...dataProductCreate.value,
-    categoryId: idCategories
-  })
-}
+    categoryId: idCategories,
+  });
+};
 </script>
 
 <template>
@@ -143,25 +120,61 @@ const handleCreateProduct = async () => {
     <div class="mt-3">
       <DataTable
         paginator
+        :loading="useProduct.loading"
         :rows="10"
         :value="useProduct.listProduct"
         showGridlines
         tableStyle="min-width: 50rem"
       >
+        <Column field="index" header="#">
+          <template #body="slotProps">
+            {{ slotProps.index + 1 }}
+          </template>
+        </Column>
+        <Column header="Action" style="width: 10%">
+          <template #body="slotProps">
+            <div class="flex">
+              <Button
+                size="small"
+                icon="pi pi-pencil"
+                text
+                rounded
+                severity="success"
+                aria-label="Filter"
+              />
+              <Button
+                size="small"
+                icon="pi pi-lock"
+                text
+                rounded
+                severity="warning"
+                aria-label="Filter"
+              />
+              <Button
+                size="small"
+                icon="pi pi-trash"
+                text
+                rounded
+                severity="danger"
+                aria-label="Filter"
+              />
+            </div>
+          </template>
+        </Column>
         <Column field="productCode" header="Product Code"></Column>
         <Column field="productName" header="Product Name"></Column>
         <Column field="categories" header="Category">
           <template #body="slotProps">
-            <div>
-              <p v-for="val in slotProps.data.categories">
-                {{ val.nameCategory }}
-              </p>
-            </div>
-          </template></Column
-        >
+            <div class="flex gap-2 flex-column">
+              <Tag
+                v-for="val in slotProps.data.categories"
+                severity="success"
+                :value="val.nameCategory"
+              ></Tag>
+            </div> </template
+        ></Column>
         <Column field="productUnit" header="Unit"></Column>
-        <Column field="productPrice" header="Price"></Column>
-        <Column field="productPrice" header="Action"></Column>
+        <Column field="productPrice" header="Price"> </Column>
       </DataTable>
     </div>
   </div>
