@@ -17,12 +17,17 @@
               severity="success"
               type="button"
               @click="handleSearch"
+              class="btn-search"
             />
           </div>
         </div>
         <div class="create">
           <Button
-            @click="visible = true"
+            @click="
+              {
+                ;(visible = true), (modalMember = 'create')
+              }
+            "
             rounded
             type="button"
             severity="success"
@@ -49,7 +54,7 @@
           <Column field="name" header="Name"></Column>
           <Column field="email" header="Email"></Column>
           <Column field="phone" header="Phone"></Column>
-          <Column field="createDate" header="Date">
+          <Column field="createDate" header="Date Create">
             <template #body="slotProps">
               {{ formatDate(slotProps.data.createDate) }}
             </template>
@@ -70,6 +75,32 @@
               </div>
             </template>
           </Column>
+          <Column field="isBlock" header="Action">
+            <template #body="slotProps">
+              <div>
+                <i
+                  class="pi pi-user-edit"
+                  style="cursor: pointer; margin-right: 10px; font-size: 20px"
+                  @click="
+                    {
+                      ;(visible = true), (modalMember = 'edit')
+                      handleEditMember(slotProps.data)
+                    }
+                  "
+                ></i>
+                <i
+                  class="pi pi-trash"
+                  style="cursor: pointer; font-size: 20px"
+                  @click="
+                    handleDeleteMember(
+                      slotProps.data.username,
+                      slotProps.data.name
+                    )
+                  "
+                ></i>
+              </div>
+            </template>
+          </Column>
         </DataTable>
       </div>
     </div>
@@ -78,6 +109,7 @@
       modal
       header="Add Member"
       :style="{ width: '60vw' }"
+      v-if="modalMember == 'create'"
     >
       <form @submit.prevent="handleCreateMember">
         <div class="member-modal-add">
@@ -104,6 +136,43 @@
         </div>
         <div class="member-btn-add">
           <Button label="Create" severity="success" type="submit" />
+          <Button
+            @click="visible = false"
+            label="Cancel"
+            severity="secondary"
+            type="button"
+          />
+        </div>
+      </form>
+    </Dialog>
+    <Dialog
+      v-model:visible="visible"
+      modal
+      header="Edit Member"
+      :style="{ width: '60vw' }"
+      v-else
+    >
+      <form @submit.prevent="submitEditMember">
+        <div class="member-modal-add">
+          <div class="item-add flex flex-column gap-2">
+            <label for="username">User Name</label>
+            <InputText :value="edit.username" disabled />
+          </div>
+          <div class="item-add flex flex-column gap-2">
+            <label for="username">Name</label>
+            <InputText v-model="edit.name" required />
+          </div>
+          <div class="item-add flex flex-column gap-2">
+            <label for="username">Email</label>
+            <InputText v-model="edit.email" required />
+          </div>
+          <div class="item-add flex flex-column gap-2">
+            <label for="username">Phone</label>
+            <InputText v-model="edit.phone" type="number" />
+          </div>
+        </div>
+        <div class="member-btn-add">
+          <Button label="Edit" severity="success" type="submit" />
           <Button
             @click="visible = false"
             label="Cancel"
@@ -144,6 +213,13 @@ const filterSelect = status.value.find(
 )
 const selectedStatus = ref(filterSelect || null)
 const valueSearch = ref(router.currentRoute.value.query.textSearch || null)
+const modalMember = ref('create')
+const edit = ref({
+  username: '',
+  name: '',
+  email: '',
+  phone: ''
+})
 
 const { handleSubmit, useFieldModel, errors, resetForm } = useForm({
   validationSchema: schema
@@ -194,6 +270,38 @@ const handleSearch = async () => {
     }
   })
 }
+
+const handleDeleteMember = async (userName, name) => {
+  Swal.fire({
+    text: `Do you want delete ${name}`
+  }).then(async result => {
+    if (result.isConfirmed) {
+      await members.blockDeleteMember({ username: userName, type: 'DELETE' })
+      Swal.fire('Success!', '', 'success')
+    } else if (result.isDenied) {
+      Swal.fire('Changes are not saved', '', 'info')
+    }
+  })
+}
+
+const handleEditMember = value => {
+  edit.value = {
+    username: value.username,
+    name: value.name,
+    email: value.email,
+    phone: value.phone
+  }
+}
+
+const submitEditMember = handleSubmit(async () => {
+  visible.value = false
+  await members.actionEditMember({
+    username: edit.value.username,
+    name: edit.value.name,
+    email: edit.value.email,
+    phone: edit.value.phone
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -205,6 +313,7 @@ const handleSearch = async () => {
   padding: 20px;
   border-radius: 8px;
 }
+
 .wrap-top {
   display: flex;
   justify-content: space-between;
@@ -229,15 +338,22 @@ const handleSearch = async () => {
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
+
 .member-btn-add {
   margin-top: 10px;
   display: flex;
   justify-content: center;
+
   button {
     &:first-child {
       margin-right: 10px;
     }
   }
+}
+
+.btn-search {
+  justify-content: center;
+  width: 110px;
 }
 
 @media (max-width: 1023px) {
