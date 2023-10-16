@@ -3,11 +3,12 @@
     <div class="page_header_search">
       <span class="p-input-icon-left">
         <i class="pi pi-search" />
-        <InputText v-model="value1" placeholder="Search" />
+        <InputText  placeholder="Search" />
       </span>
     </div>
     <div class="page_header_loader"></div>
     <div class="content_header">
+      <I18nDropComp/>
       <ProfileDropComp />
       <NoticationDropComp />
     </div>
@@ -19,6 +20,7 @@ import { ref } from "vue";
 import InputText from "primevue/inputtext";
 import ProfileDropComp from "./HeaderComponent/ProfileDropComp.vue";
 import NoticationDropComp from "./HeaderComponent/NoticationDropComp.vue";
+import I18nDropComp from "./HeaderComponent/I18nDropComp.vue";
 </script>
 
 <style scoped lang="scss">

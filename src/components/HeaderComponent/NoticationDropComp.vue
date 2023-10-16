@@ -77,7 +77,7 @@ const recentItems = computed(() => {
     }
     .round{
         position: absolute;
-        top: 6px;
+        top: 10px;
         left: 14px;
         width: 6px;
         height: 6px;
@@ -99,7 +99,7 @@ const recentItems = computed(() => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.7em 0.5em;
+      padding: 12px 6px;
       border-radius: 0.5em;
       cursor: pointer;
       &:focus{
@@ -124,7 +124,7 @@ const recentItems = computed(() => {
   .dropdown-content {
     list-style: none;
     position: absolute;
-    top: 24px;
+    top: 30px;
     right: 0;
     width: 244px;
     border-radius: 0.5em;
