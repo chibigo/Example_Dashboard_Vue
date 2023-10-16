@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import { getListProduct, createProduct, createProductSku } from "@/api/product";
+import {
+  getListProduct,
+  createProduct,
+  createProductSku,
+  updateProduct,
+} from "@/api/product";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export const useProductStore = defineStore("product", {
@@ -23,6 +28,25 @@ export const useProductStore = defineStore("product", {
     async createProductAction(data) {
       try {
         const res = await createProduct(data);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: res.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        await this.getListProductAction();
+      } catch (err) {
+        Swal.fire({
+          title: "Error!",
+          text: err,
+          icon: "error",
+        });
+      }
+    },
+    async updateProductAction(data) {
+      try {
+        const res = await updateProduct(data);
         Swal.fire({
           position: "center",
           icon: "success",

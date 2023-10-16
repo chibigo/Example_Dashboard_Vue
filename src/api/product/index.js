@@ -9,6 +9,15 @@ export const createProduct = async (body) => {
   return res.data;
 };
 
+export const updateProduct = async (body) => {
+  const res = await SSRRequest({
+    url: `/admin/product/update`,
+    method: "POST",
+    data: JSON.stringify(body),
+  });
+  return res.data;
+};
+
 export const getListProduct = async (params) => {
   const res = await SSRRequest({
     url: `/admin/product/list${params ? params : ""}`,

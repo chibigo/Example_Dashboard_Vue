@@ -13,14 +13,14 @@ import "vue3-treeselect/dist/vue3-treeselect.css";
 import Button from "primevue/button";
 import { useProductStore } from "@/stores/product";
 import MultiSelect from "primevue/multiselect";
+import FileUpload from "primevue/fileupload";
 import { useCategoryStore } from "@/stores/category";
-import { formatDateV2 } from "@/utils";
+import { convertMoney, formatDate, formatDateV2 } from "@/utils";
+import Carousel from "primevue/carousel";
 
 const useProduct = useProductStore();
 const useCategory = useCategoryStore();
 const visible = ref(false);
-const images = ref([]);
-const filesData = ref([]);
 const optionCategory = ref([]);
 const selectCategory = ref();
 const title = ref("Add Product");
@@ -28,6 +28,10 @@ const typeCreate = ref(true);
 
 const textSearch = ref("");
 const dates = ref();
+
+const urlApi = "http://192.168.1.6:8080/api/v1";
+
+const actionType = ref("Create");
 
 const status = ref([
   { name: "All", code: undefined },
@@ -45,6 +49,7 @@ const dataProductCreate = ref({
   description: "",
   categoryId: [],
   productPrice: 0,
+  urlImage: [],
 });
 
 onUnmounted(() => {
@@ -77,67 +82,50 @@ watch(visible, (value) => {
       categoryId: [],
       productPrice: 0,
     };
+    actionType.value = "Create";
+    selectCategory.value = null;
     title.value = "Add Product";
     typeCreate.value = true;
   }
 });
-
-const onDragOver = (event) => {
-  event.preventDefault();
-};
-
-const handleFileUpload = (event) => {
-  const files = event.target.files;
-  processFiles(files);
-};
-
-let formdata = new FormData();
-
-const handleFileDrop = (event) => {
-  event.preventDefault();
-  formdata.append("file", event.target.files);
-  const files = event.dataTransfer.files;
-  processFiles(files);
-};
-
-const processFiles = (files) => {
-  filesData.value = files;
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      images.value.push({
-        name: file.name,
-        url: e.target.result,
-        type: file.type,
-        isSuccess: false,
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
-const removeImage = (index) => {
-  images.value.splice(index, 1);
-};
 
 const handleCreateProduct = async () => {
   const idCategories = [];
   selectCategory.value.map((id) => {
     idCategories.push(id.idCategory);
   });
-  await useProduct.createProductAction({
-    ...dataProductCreate.value,
-    categoryId: idCategories,
-  });
+  if (actionType.value === "Create") {
+    await useProduct.createProductAction({
+      ...dataProductCreate.value,
+      categoryId: idCategories,
+    });
+  } else {
+    await useProduct.updateProductAction({
+      ...dataProductCreate.value,
+      categoryId: idCategories,
+    });
+  }
+
   visible.value = false;
 };
 
 const handleUpdateProduct = (data) => {
   title.value = "Update Product";
+  actionType.value = "Update";
   visible.value = true;
   typeCreate.value = false;
   dataProductCreate.value = data;
+  let dataCate = [];
+  data.categories.map((val) => {
+    dataCate = [
+      ...dataCate,
+      {
+        idCategory: val.id,
+        name: val.nameCategory,
+      },
+    ];
+  });
+  selectCategory.value = dataCate;
 };
 
 const handleSearchProduct = async () => {
@@ -157,6 +145,25 @@ const handleSearchProduct = async () => {
   }
 
   await useProduct.getListProductAction(params);
+};
+
+const onAdvancedUpload = (e) => {
+  const res = JSON.parse(e.xhr.response);
+  if (res.success) {
+    let image = null;
+    res.data.map((e) => {
+      image = image + e + ",";
+    });
+    dataProductCreate.value.productImage =
+      dataProductCreate.value.productImage + image;
+  }
+};
+
+const handleRemoveImage = (index) => {
+  let listImage = dataProductCreate.value.productImage.split(",");
+  listImage.splice(index, 1);
+  dataProductCreate.value.productImage = listImage.join();
+  dataProductCreate.value.urlImage.splice(index, 1);
 };
 </script>
 
@@ -264,7 +271,16 @@ const handleSearchProduct = async () => {
             </div> </template
         ></Column>
         <Column field="productUnit" header="Unit"></Column>
-        <Column field="productPrice" header="Price"> </Column>
+        <Column field="productPrice" header="Price">
+          <template #body="slotProps">
+            {{ convertMoney(slotProps.data.productPrice) }}
+          </template>
+        </Column>
+        <Column header="Crate Date">
+          <template #body="slotProps">
+            {{ formatDate(slotProps.data.createDate) }}
+          </template>
+        </Column>
       </DataTable>
     </div>
   </div>
@@ -327,49 +343,52 @@ const handleSearchProduct = async () => {
         editorStyle="height: 200px"
       />
     </div>
-    <div class="mt-2">
-      <span class="mb-2">Product Image</span>
-      <div
-        class="dropzone mt-2"
-        @dragover.prevent="onDragOver"
-        @drop.prevent="handleFileDrop"
+    <div class="mt-2" v-if="dataProductCreate.urlImage?.length > 0">
+      <span class="mb-2">Image Product</span>
+      <Carousel
+        :value="dataProductCreate.urlImage"
+        :numVisible="3"
+        :numScroll="3"
       >
-        <p>Drag and drop images here</p>
-        <div class="input_upload">
-          <input
-            type="file"
-            name="file"
-            ref="myFiles"
-            id="file"
-            accept="image/*"
-            @change="handleFileUpload"
-            class="inputfile"
-            data-multiple-caption="{count} files"
-            multiple
-          />
-          <label for="file"><i class="pi pi-paperclip"></i> Choose file</label>
-        </div>
-      </div>
-      <div class="image-container">
-        <div
-          class="item_image"
-          v-for="(image, index) in images.reverse()"
-          :key="index"
-        >
-          <div class="image">
-            <img :src="image.url" :alt="image.name" />
+        <template #item="slotProps">
+          <div
+            class="border-1 surface-border border-round m-2 text-center py-5 px-3"
+          >
+            <img
+              class="image-preview"
+              :src="urlApi + slotProps.data"
+              alt="1232"
+            />
+            <div class="mt-2">
+              <Button
+                @click="handleRemoveImage(slotProps.index)"
+                icon="pi pi-trash"
+                size="small"
+                severity="danger"
+                rounded
+              />
+            </div>
           </div>
-          <div class="btn_group">
-            <button class="btn btn_remove" @click="removeImage(index)">
-              <i class="pi pi-trash"></i>
-              Remove
-            </button>
-          </div>
-        </div>
-      </div>
+        </template>
+      </Carousel>
+    </div>
+    <div class="mt-2">
+      <span class="mb-2">Upload Image Product</span>
+      <FileUpload
+        name="file"
+        :url="urlApi + '/upload/image'"
+        @upload="onAdvancedUpload"
+        :multiple="true"
+        accept="image/*"
+        :maxFileSize="1000000"
+      >
+        <template #empty>
+          <p>Drag and drop files to here to upload.</p>
+        </template>
+      </FileUpload>
     </div>
     <div class="product-btn-add">
-      <Button @click="handleCreateProduct" label="Create" severity="success" />
+      <Button @click="handleCreateProduct" label="Save" severity="success" />
       <Button @click="visible = false" label="Cancel" severity="secondary" />
     </div>
   </Dialog>
@@ -398,6 +417,12 @@ const handleSearchProduct = async () => {
   gap: 20px;
 }
 
+.image-preview {
+  width: 100%;
+  object-fit: cover;
+  height: 200px;
+}
+
 .product-btn-add {
   margin-top: 10px;
   display: flex;
@@ -406,102 +431,6 @@ const handleSearchProduct = async () => {
   button {
     &:first-child {
       margin-right: 10px;
-    }
-  }
-}
-
-.dropzone {
-  border: 2px dashed #ccc;
-  text-align: center;
-  padding: 20px;
-  cursor: pointer;
-}
-
-.dropzone p {
-  font-size: 18px;
-  color: #b9b9b9;
-  margin-bottom: 12px;
-}
-
-.input_upload {
-  .inputfile {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
-  .inputfile + label {
-    padding: 3px 8px;
-    font-size: 1.25em;
-    font-weight: 700;
-    color: white;
-    background-color: #4fc08d;
-    display: inline-block;
-    border-radius: 8px;
-  }
-  .inputfile:focus + label,
-  .inputfile + label:hover {
-    opacity: 0.8;
-  }
-  .inputfile + label {
-    cursor: pointer;
-  }
-  .inputfile:focus + label {
-    outline: 1px dotted #4fc08d;
-  }
-}
-
-.image-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-column-gap: 10px;
-  padding: 20px 0;
-  .item_image {
-    margin: 0 auto;
-    border: 1px solid #4fc08d;
-    border-radius: 8px;
-    .image {
-      width: 260px;
-      height: 200px;
-      padding: 10px;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
-        display: block;
-      }
-    }
-    .btn_group {
-      display: flex;
-      justify-content: center;
-      column-gap: 8px;
-      margin: 10px 0 10px 0;
-      .btn {
-        border: 1px solid;
-        padding: 8px 12px;
-        background-color: transparent;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-      .btn_download {
-        border-color: #00bfff;
-        color: #00bfff;
-        &:hover {
-          background-color: #00bfff;
-          color: #fff;
-        }
-      }
-      .btn_remove {
-        color: #ff3300;
-        border-color: #ff3300;
-        &:hover {
-          background-color: #ff3300;
-          color: #fff;
-        }
-      }
     }
   }
 }
