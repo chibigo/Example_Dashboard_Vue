@@ -1,7 +1,7 @@
 <template>
   <div class="page_404">
-    <div class="container h-100">
-      <div class="row h-100">
+    <div class="container h_full_screen">
+      <div class="row h_full_screen">
         <div class="col-sm-12 group_page ">
           <div class="col-sm-10 col-sm-offset-1 text-center">
             <div class="four_zero_four_bg">
@@ -30,6 +30,9 @@
   background: #fff;
   font-family: "Arvo", serif;
   height: 100vh;
+  .h_full_screen{
+    height: 100%;
+  }
 }
 
 .page_404 img {

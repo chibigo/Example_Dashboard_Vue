@@ -85,7 +85,7 @@ const handleLogout = () => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.7em 0.5em;
+      padding: 12px 6px;
       border-radius: 0.5em;
       cursor: pointer;
       &:focus{
@@ -111,7 +111,7 @@ const handleLogout = () => {
   .dropdown-content {
     list-style: none;
     position: absolute;
-    top: 24px;
+    top: 30px;
     width: 100%;
     border-radius: 0.5em;
     padding-left: 0;
