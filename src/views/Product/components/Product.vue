@@ -54,6 +54,15 @@ onBeforeMount(async () => {
 
 watch(visible, (value) => {
   if (!value) {
+    dataProductCreate.value = {
+      productCode: "",
+      productName: "",
+      productUnit: "",
+      productImage: "",
+      description: "",
+      categoryId: [],
+      productPrice: 0,
+    };
     title.value = "Add Product";
     typeCreate.value = true;
   }
