@@ -26,6 +26,14 @@ export const getListProduct = async (params) => {
   return res.data;
 };
 
+export const actionProduct = async (productCode, type) => {
+  const res = await SSRRequest({
+    url: `/admin/product/action?productCode=${productCode}&type=${type}`,
+    method: "GET",
+  });
+  return res.data;
+};
+
 export const createProductSku = async (body) => {
   const res = await SSRRequest({
     url: `admin/productSkuPrice/create`,

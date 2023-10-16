@@ -17,6 +17,8 @@ import FileUpload from "primevue/fileupload";
 import { useCategoryStore } from "@/stores/category";
 import { convertMoney, formatDate, formatDateV2 } from "@/utils";
 import Carousel from "primevue/carousel";
+import { TypeAction } from "@/utils/typeAction";
+import Swal from "sweetalert2";
 
 const useProduct = useProductStore();
 const useCategory = useCategoryStore();
@@ -165,6 +167,47 @@ const handleRemoveImage = (index) => {
   dataProductCreate.value.productImage = listImage.join();
   dataProductCreate.value.urlImage.splice(index, 1);
 };
+
+const handleActionProduct = async (productCode, type, isSale) => {
+  switch (type) {
+    case TypeAction.BLOCK: {
+      if (isSale === 0) {
+        Swal.fire({
+          text: `Do you want block product ?`,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            await useProduct.actionProductAction(productCode, type);
+          } else if (result.isDenied) {
+            await Swal.fire("Changes are not saved", "", "info");
+          }
+        });
+      } else {
+        Swal.fire({
+          text: `Do you want unblock product ?`,
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            await useProduct.actionProductAction(productCode, type);
+          } else if (result.isDenied) {
+            await Swal.fire("Changes are not saved", "", "info");
+          }
+        });
+      }
+      break;
+    }
+    case TypeAction.DELETE: {
+      Swal.fire({
+        text: `Do you want delete product ?`,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await useProduct.actionProductAction(productCode, type);
+        } else if (result.isDenied) {
+          await Swal.fire("Changes are not saved", "", "info");
+        }
+      });
+      break;
+    }
+  }
+};
 </script>
 
 <template>
@@ -241,16 +284,32 @@ const handleRemoveImage = (index) => {
               />
               <Button
                 size="small"
-                icon="pi pi-lock"
+                :icon="
+                  slotProps.data.isSale === 0 ? 'pi pi-lock' : 'pi pi-lock-open'
+                "
                 text
                 rounded
                 severity="warning"
                 aria-label="Filter"
+                @click="
+                  handleActionProduct(
+                    slotProps.data.productCode,
+                    TypeAction.BLOCK,
+                    slotProps.data.isSale,
+                  )
+                "
               />
               <Button
                 size="small"
                 icon="pi pi-trash"
                 text
+                @click="
+                  handleActionProduct(
+                    slotProps.data.productCode,
+                    TypeAction.DELETE,
+                    null,
+                  )
+                "
                 rounded
                 severity="danger"
                 aria-label="Filter"
