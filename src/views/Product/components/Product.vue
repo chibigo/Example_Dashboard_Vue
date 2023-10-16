@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onBeforeMount, onUnmounted, watch } from "vue";
 import DataTable from "primevue/datatable";
+import Dropdown from "primevue/dropdown";
+import Calendar from "primevue/calendar";
 import Column from "primevue/column";
 import Tag from "primevue/tag";
 import Dialog from "primevue/dialog";
@@ -12,6 +14,7 @@ import Button from "primevue/button";
 import { useProductStore } from "@/stores/product";
 import MultiSelect from "primevue/multiselect";
 import { useCategoryStore } from "@/stores/category";
+import { formatDateV2 } from "@/utils";
 
 const useProduct = useProductStore();
 const useCategory = useCategoryStore();
@@ -22,6 +25,17 @@ const optionCategory = ref([]);
 const selectCategory = ref();
 const title = ref("Add Product");
 const typeCreate = ref(true);
+
+const textSearch = ref("");
+const dates = ref();
+
+const status = ref([
+  { name: "All", code: undefined },
+  { name: "Active", code: 0 },
+  { name: "Block", code: 1 },
+]);
+
+const selectedStatus = ref({ name: "All", code: undefined });
 
 const dataProductCreate = ref({
   productCode: "",
@@ -125,6 +139,25 @@ const handleUpdateProduct = (data) => {
   typeCreate.value = false;
   dataProductCreate.value = data;
 };
+
+const handleSearchProduct = async () => {
+  let params = "?";
+  if (textSearch.value.trim()) {
+    params = params + `searchText=${textSearch.value}&`;
+  }
+  if (selectedStatus.value.code) {
+    params = params + `isBlock=${selectedStatus.value.code}&`;
+  }
+  if (dates.value) {
+    params =
+      params +
+      `startDate=${formatDateV2(
+        dates.value[0],
+      )} 00:00:00&endDate=${formatDateV2(dates.value[1])} 23:59:59`;
+  }
+
+  await useProduct.getListProductAction(params);
+};
 </script>
 
 <template>
@@ -138,6 +171,40 @@ const handleUpdateProduct = (data) => {
         label="Add Product"
         icon="pi pi-plus"
       />
+    </div>
+    <div class="search-product mb-4">
+      <div>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" />
+          <InputText v-model="textSearch" placeholder="Search" />
+        </span>
+      </div>
+      <div>
+        <Dropdown
+          v-model="selectedStatus"
+          :options="status"
+          optionLabel="name"
+          placeholder="Select a City"
+          class="w-full md:w-14rem"
+        />
+      </div>
+      <div>
+        <Calendar
+          :showIcon="true"
+          placeholder="Select Time"
+          v-model="dates"
+          selectionMode="range"
+          :manualInput="false"
+        />
+      </div>
+      <div>
+        <Button
+          label="Search"
+          @click="handleSearchProduct"
+          severity="success"
+          raised
+        />
+      </div>
     </div>
     <div class="mt-3">
       <DataTable
@@ -309,12 +376,19 @@ const handleUpdateProduct = (data) => {
 </template>
 
 <style scoped lang="scss">
-.product-main {
+.product {
   width: 100%;
 
   .product-add {
     display: flex;
     justify-content: flex-end;
+  }
+
+  .search-product {
+    display: flex;
+    div {
+      margin-right: 5px;
+    }
   }
 }
 
@@ -430,5 +504,11 @@ const handleUpdateProduct = (data) => {
       }
     }
   }
+}
+</style>
+
+<style>
+.p-dialog-content::-webkit-scrollbar {
+  display: none;
 }
 </style>
