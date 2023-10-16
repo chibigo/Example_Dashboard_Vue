@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, onUnmounted } from "vue";
+import { ref, onBeforeMount, onUnmounted, watch } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Tag from "primevue/tag";
@@ -20,6 +20,8 @@ const images = ref([]);
 const filesData = ref([]);
 const optionCategory = ref([]);
 const selectCategory = ref();
+const title = ref("Add Product");
+const typeCreate = ref(true);
 
 const dataProductCreate = ref({
   productCode: "",
@@ -48,6 +50,13 @@ onBeforeMount(async () => {
   });
 
   optionCategory.value = customCategory;
+});
+
+watch(visible, (value) => {
+  if (!value) {
+    title.value = "Add Product";
+    typeCreate.value = true;
+  }
 });
 
 const onDragOver = (event) => {
@@ -91,17 +100,21 @@ const removeImage = (index) => {
 
 const handleCreateProduct = async () => {
   const idCategories = [];
-
   selectCategory.value.map((id) => {
     idCategories.push(id.idCategory);
   });
-
-  visible.value = false;
-
   await useProduct.createProductAction({
     ...dataProductCreate.value,
     categoryId: idCategories,
   });
+  visible.value = false;
+};
+
+const handleUpdateProduct = (data) => {
+  title.value = "Update Product";
+  visible.value = true;
+  typeCreate.value = false;
+  dataProductCreate.value = data;
 };
 </script>
 
@@ -135,6 +148,7 @@ const handleCreateProduct = async () => {
           <template #body="slotProps">
             <div class="flex">
               <Button
+                @click="handleUpdateProduct(slotProps.data)"
                 size="small"
                 icon="pi pi-pencil"
                 text
@@ -181,13 +195,14 @@ const handleCreateProduct = async () => {
   <Dialog
     v-model:visible="visible"
     modal
-    header="Add Product"
+    :header="title"
     :style="{ width: '60vw' }"
   >
     <div class="product-modal-add mb-3">
       <div class="item-add flex flex-column gap-2">
         <label for="username">Product Code</label>
         <InputText
+          :disabled="!typeCreate"
           id="username"
           v-model="dataProductCreate.productCode"
           aria-describedby="username-help"
