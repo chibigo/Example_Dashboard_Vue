@@ -32,3 +32,13 @@ export const createMember = async data => {
 
   return res.data
 }
+
+export const EditMember = async data => {
+  const res = await SSRRequest({
+    url: '/admin/member/update',
+    method: 'POST',
+    data
+  })
+
+  return res.data
+}
