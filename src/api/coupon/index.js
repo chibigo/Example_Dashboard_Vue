@@ -16,3 +16,11 @@ export const getListCoupon = async (params) => {
   });
   return res.data;
 };
+
+export const changeStatusCoupon = async (status, couponId) => {
+  const res = await SSRRequest({
+    url: `/admin/coupon/changeStatus?status=${status}&couponId=${couponId}`,
+    method: "GET",
+  });
+  return res.data;
+};

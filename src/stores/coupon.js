@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { createCoupon, getListCoupon } from "@/api/coupon";
+import { changeStatusCoupon, createCoupon, getListCoupon } from "@/api/coupon";
 
 export const useCouponStore = defineStore("coupon", {
   state: () => {
@@ -11,6 +11,7 @@ export const useCouponStore = defineStore("coupon", {
       try {
         const res = await createCoupon(data);
         if (res.success) {
+          await this.getListCouponAction();
           return res;
         } else {
           return null;
@@ -29,6 +30,19 @@ export const useCouponStore = defineStore("coupon", {
         }
       } catch (e) {
         this.listCoupon = [];
+      }
+    },
+    async changeStatusCouponAction(status, couponId) {
+      try {
+        const res = await changeStatusCoupon(status, couponId);
+        if (res.success) {
+          await this.getListCouponAction();
+          return res.success;
+        } else {
+          return false;
+        }
+      } catch (e) {
+        return false;
       }
     },
   },

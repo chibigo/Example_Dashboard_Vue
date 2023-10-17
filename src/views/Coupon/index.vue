@@ -28,6 +28,7 @@ const types = ref([
 const dates = ref();
 
 const dataCreateCoupon = ref({
+  couponId: null,
   couponName: "",
   description: "",
   totalInvoice: 0,
@@ -44,6 +45,7 @@ onMounted(() => {
 watch(visible, (value) => {
   if (!value) {
     dataCreateCoupon.value = {
+      couponId: null,
       couponName: "",
       description: "",
       totalInvoice: 0,
@@ -80,7 +82,37 @@ const handleCreateCoupon = async () => {
   }
 };
 
-const handleChangeStatus = (couponId, type) => {};
+const handleChangeStatus = async (couponId, type) => {
+  const res = await useCoupon.changeStatusCouponAction(type, couponId);
+  if (res) {
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Success",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  } else {
+    Swal.fire({
+      title: "Error!",
+      text: "Error!",
+      icon: "error",
+    });
+  }
+};
+
+const handleUpdateCoupon = (data) => {
+  dataCreateCoupon.value = data;
+  dates.value = [new Date(data.startDate), new Date(data.endDate)];
+  selectedType.value = {
+    code: dataCreateCoupon.value.typeCoupon,
+    name:
+      dataCreateCoupon.value.typeCoupon === "MONEY"
+        ? "Reduce bills"
+        : "Reduce invoice percentage",
+  };
+  visible.value = true;
+};
 </script>
 
 <template>
@@ -106,7 +138,16 @@ const handleChangeStatus = (couponId, type) => {};
             <template #body="slotProps">
               <div>
                 <Button
-                  v-if="slotProps.data.status === Status.WRITE"
+                  @click="
+                    handleChangeStatus(
+                      slotProps.data.couponId,
+                      Status.ACTIVATED,
+                    )
+                  "
+                  v-if="
+                    slotProps.data.status === Status.WRITE ||
+                    slotProps.data.status === Status.PAUSE
+                  "
                   icon="pi pi-play"
                   severity="success"
                   text
@@ -114,6 +155,9 @@ const handleChangeStatus = (couponId, type) => {};
                   aria-label="Search"
                 />
                 <Button
+                  @click="
+                    handleChangeStatus(slotProps.data.couponId, Status.PAUSE)
+                  "
                   v-if="slotProps.data.status === Status.ACTIVATED"
                   icon="pi pi-pause"
                   severity="warning"
@@ -122,6 +166,9 @@ const handleChangeStatus = (couponId, type) => {};
                   aria-label="Search"
                 />
                 <Button
+                  @click="
+                    handleChangeStatus(slotProps.data.couponId, Status.STOP)
+                  "
                   v-if="slotProps.data.status === Status.ACTIVATED"
                   icon="pi pi-stop"
                   severity="danger"
@@ -130,6 +177,7 @@ const handleChangeStatus = (couponId, type) => {};
                   aria-label="Search"
                 />
                 <Button
+                  @click="handleUpdateCoupon(slotProps.data)"
                   v-if="slotProps.data.status === Status.WRITE"
                   icon="pi pi-pencil"
                   severity="help"
