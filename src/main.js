@@ -19,8 +19,8 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(i18n);
 pinia.use(piniaPluginPersistedstate);
+app.use(VueSweetalert2);
 app.use(PrimeVue);
 app.use(router);
-app.use(VueSweetalert2);
 
 app.mount("#app");
