@@ -131,7 +131,7 @@
           </div>
           <div class="item-add flex flex-column gap-2">
             <label for="username">Phone</label>
-            <InputText v-model="phone" type="number" />
+            <InputNumber v-model="phone" />
           </div>
         </div>
         <div class="member-btn-add">
@@ -168,7 +168,7 @@
           </div>
           <div class="item-add flex flex-column gap-2">
             <label for="username">Phone</label>
-            <InputText v-model="edit.phone" type="number" />
+            <InputNumber v-model="edit.phone" type="number" />
           </div>
         </div>
         <div class="member-btn-add">
@@ -200,6 +200,7 @@ import { schema } from './schema'
 import { useForm } from 'vee-validate'
 import Dropdown from 'primevue/dropdown'
 import router from '../../router'
+import InputNumber from 'primevue/inputnumber'
 
 const visible = ref(false)
 const members = useMemberStore()
