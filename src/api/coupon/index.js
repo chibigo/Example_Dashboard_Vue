@@ -1,4 +1,5 @@
 import SSRRequest from "../axios";
+import queryString from "query-string";
 
 export const createCoupon = async (body) => {
   const res = await SSRRequest({
@@ -10,8 +11,9 @@ export const createCoupon = async (body) => {
 };
 
 export const getListCoupon = async (params) => {
+  const queryParams = queryString.stringify(params);
   const res = await SSRRequest({
-    url: `/admin/coupon/list`,
+    url: `/admin/coupon/list${params ? "?" : ""}${queryParams}`,
     method: "GET",
   });
   return res.data;

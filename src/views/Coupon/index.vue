@@ -12,7 +12,7 @@ import Column from "primevue/column";
 import { useCouponStore } from "@/stores/coupon";
 import Tag from "primevue/tag";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { convertMoney, formatDate } from "../../utils";
+import { convertMoney, formatDate, formatDateV2 } from "@/utils";
 import { Status } from "@/utils/typeAction";
 
 const useCoupon = useCouponStore();
@@ -25,7 +25,19 @@ const types = ref([
   { name: "Reduce bills", code: "MONEY" },
 ]);
 
+const selectedStatus = ref();
+const status = ref([
+  { name: "ALL", code: undefined },
+  { name: Status.ACTIVATED, code: Status.ACTIVATED },
+  { name: Status.PAUSE, code: Status.PAUSE },
+  { name: Status.STOP, code: Status.STOP },
+  { name: Status.WRITE, code: Status.WRITE },
+]);
+
 const dates = ref();
+
+const dateSearch = ref();
+const textSearch = ref("");
 
 const dataCreateCoupon = ref({
   couponId: null,
@@ -113,19 +125,76 @@ const handleUpdateCoupon = (data) => {
   };
   visible.value = true;
 };
+
+const handleSearch = async () => {
+  await useCoupon.getListCouponAction({
+    type: selectedType.value ? selectedType.value.code : undefined,
+    startDate: dateSearch.value
+      ? formatDateV2(dateSearch.value[0]) + " 00:00:00"
+      : undefined,
+    endDate: dateSearch.value
+      ? formatDateV2(dateSearch.value[1]) + " 23:59:59"
+      : undefined,
+    couponName: textSearch.value ? textSearch.value : undefined,
+    status: selectedStatus.value ? selectedStatus.value.code : undefined,
+  });
+};
 </script>
 
 <template>
   <div>
     <div class="coupon-main">
       <h3>Coupon Manager</h3>
-      <div>
+      <div class="flex justify-content-end">
         <Button
           @click="visible = true"
           label="Add Coupon"
           severity="success"
           raised
         />
+      </div>
+      <div class="search-coupon mb-4 mt-2">
+        <div>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="textSearch" placeholder="Search" />
+          </span>
+        </div>
+        <div>
+          <Dropdown
+            v-model="selectedType"
+            :options="types"
+            optionLabel="name"
+            placeholder="Select type"
+            class="w-full md:w-14rem"
+          />
+        </div>
+        <div>
+          <Dropdown
+            v-model="selectedStatus"
+            :options="status"
+            optionLabel="name"
+            placeholder="Select status"
+            class="w-full md:w-14rem"
+          />
+        </div>
+        <div>
+          <Calendar
+            v-model="dateSearch"
+            :showIcon="true"
+            placeholder="Select Time"
+            selectionMode="range"
+            :manualInput="false"
+          />
+        </div>
+        <div>
+          <Button
+            @click="handleSearch"
+            label="Search"
+            severity="success"
+            raised
+          />
+        </div>
       </div>
       <div class="mt-3">
         <DataTable :value="useCoupon.listCoupon" tableStyle="min-width: 50rem">
@@ -343,6 +412,14 @@ const handleUpdateCoupon = (data) => {
   height: 100%;
   padding: 20px;
   border-radius: 8px;
+
+  .search-coupon {
+    display: flex;
+
+    div {
+      margin-left: 5px;
+    }
+  }
 }
 
 .coupon-modal {

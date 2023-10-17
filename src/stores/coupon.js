@@ -20,9 +20,9 @@ export const useCouponStore = defineStore("coupon", {
         return null;
       }
     },
-    async getListCouponAction() {
+    async getListCouponAction(param) {
       try {
-        const res = await getListCoupon();
+        const res = await getListCoupon(param);
         if (res.success) {
           this.listCoupon = res.data;
         } else {

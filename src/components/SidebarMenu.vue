@@ -50,7 +50,7 @@ const iconData = ref([
   },
   {
     key: "coupon",
-    icon: "pi pi-cog",
+    icon: "pi pi-ticket",
   },
 ]);
 onBeforeMount(() => {
