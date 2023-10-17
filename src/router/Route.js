@@ -37,6 +37,11 @@ export const routes = [
         name: "setting",
         component: () => import("@/views/SettingView.vue"),
       },
+      {
+        path: "/coupon",
+        name: "coupon",
+        component: () => import("@/views/Coupon/index.vue"),
+      },
     ],
   },
   {
