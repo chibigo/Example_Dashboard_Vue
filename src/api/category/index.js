@@ -8,13 +8,11 @@ export const getListCategoryApi = async () => {
     return res
 }
 
-export const blockDeleteCategoryRequest = async params => {
-    const queryParams = queryString.stringify(params)
+export const blockDeleteCategoryRequest = async (categoryId, type) => {
     const res = await SSRRequest({
-        url: `/admin/category/action${params ? '?' : ''}${queryParams}`,
+        url: `/admin/category/action?categoryId=${categoryId}&type=${type}`,
         method: 'GET'
     })
-
     return res
 }
 

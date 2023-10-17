@@ -36,7 +36,7 @@
     <Dialog
       v-model:visible="visible"
       modal
-      header="Add Category"
+      :header="titlePopup"
       :style="{ width: '60vw' }"
     >
       <form @submit.prevent="handleCreateCategory">
@@ -56,7 +56,7 @@
             </div>
             <div class="parentId flex flex-column gap-2 mb-3">
               <label class="">Name Category</label>
-              <InputText v-model="nameCategory" id="nameCategory" required />
+              <InputText v-model="dataForm.nameCategory" id="nameCategory" autocomplete="off" required />
             </div>
           </div>
           <div class="description flex flex-column gap-2 mb-3">
@@ -64,13 +64,13 @@
             <Textarea
               rows="10"
               cols="30"
-              v-model="description"
+              v-model="dataForm.description"
               required
               style="max-height: 300px; min-height: 200px"
             />
           </div>
           <div class="btn-group">
-            <Button type="submit" label="Create" severity="success" rounded />
+            <Button type="submit" :label="nameAction" severity="success" rounded />
             <Button
               @click="visible = false"
               label="Cancel"
@@ -89,11 +89,39 @@
         :rowsPerPageOptions="[2, 10, 20, 50]"
         tableStyle="min-width: 60rem"
       >
-        <Column field="id" header="id" expander></Column>
-        <Column field="parentCategoryId" header="parentCategoryId"> </Column>
-        <Column field="nameCategory" header="nameCategory"></Column>
-        <Column field="description" header="description"></Column>
-        <Column field="createDate" header="createDate">
+        <Column field="id" header="Id" expander></Column>
+        <Column field="parentCategoryId" header="Parent categoryId"> </Column>
+        <Column field="nameCategory" header="Name category"></Column>
+        <Column field="description" header="Description"></Column>
+        <Column field="action" header="Action">
+          <template #body="slotProps">
+            <div class="flex btn_group">
+              <Button
+                @click="handleUpdateCategory(slotProps.node.data)"
+                class="btn_event"
+                size="small"
+                icon="pi pi-pencil"
+                severity="success"
+                text
+                raised
+                rounded
+                aria-label="Filter"
+              />
+              <Button
+                @click="handleActionCategory(slotProps.node.data, TypeAction.DELETE)"
+                class="btn_event"
+                size="small"
+                icon="pi pi-trash"
+                severity="danger"
+                text
+                raised
+                rounded
+                aria-label="Cancel"
+              />
+            </div>
+          </template>
+        </Column>
+        <Column field="createDate" header="Create date">
           <template #body="slotProps">
             {{ formatDate(slotProps.node.data.createDate) }}
           </template>
@@ -104,35 +132,38 @@
 </template>
 
 <script setup>
-import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
-import TreeTable from 'primevue/treetable'
-import Dialog from 'primevue/dialog'
-import Column from 'primevue/column'
-import Textarea from 'primevue/textarea'
-import { ref, onBeforeMount } from 'vue'
-import { useCategoryStore } from '../../stores/category'
-import { formatDate } from '../../utils/index'
-import TreeSelect from 'primevue/treeselect'
-import { useForm } from 'vee-validate'
+import InputText from "primevue/inputtext";
+import Dropdown from "primevue/dropdown";
+import Button from "primevue/button";
+import TreeTable from "primevue/treetable";
+import Dialog from "primevue/dialog";
+import Column from "primevue/column";
+import Textarea from "primevue/textarea";
+import { ref, onBeforeMount,watch } from "vue";
+import { useCategoryStore } from "../../stores/category";
+import { formatDate } from "../../utils/index";
+import TreeSelect from "primevue/treeselect";
+import { useForm } from "vee-validate";
+import { TypeAction } from "@/utils/typeAction";
+import Swal from "sweetalert2";
 
-const visible = ref(false)
-const category = useCategoryStore()
-const selectCategoryParent = ref(null)
-const optionCategory = ref(null)
+const visible = ref(false);
+const category = useCategoryStore();
+const selectCategoryParent = ref();
+const optionCategory = ref(null);
+const titlePopup = ref('Add Category')
+const nameAction = ref('Create')
+const dataForm = ref({
+  nameCategory:"",
+  description:""
+})
 
-const { handleSubmit, useFieldModel, errors, resetForm } = useForm()
-
-const [nameCategory, description] = useFieldModel([
-  'nameCategory',
-  'description'
-])
+const { handleSubmit, useFieldModel, errors, resetForm } = useForm();
 
 onBeforeMount(async () => {
-  await category.getListCategory()
+  await category.getListCategory();
 
-  const customCategory = []
+  const customCategory = [];
 
   category.list.map((item, index) => {
     customCategory.push({
@@ -143,33 +174,79 @@ onBeforeMount(async () => {
         return {
           key: `${index}-${indexChild}`,
           id: itemChild.data.id,
-          label: itemChild.data.nameCategory
-        }
-      })
-    })
-  })
+          label: itemChild.data.nameCategory,
+        };
+      }),
+    });
+  });
+  optionCategory.value = customCategory;
+});
 
-  optionCategory.value = customCategory
-})
-
-const handleCreateCategory = handleSubmit(async values => {
-  let getParentCategoryId = null
+const handleCreateCategory = handleSubmit(async () => {
+  let getParentCategoryId = null;
   if (selectCategoryParent.value) {
-    const valueParentSelect = Object.keys(selectCategoryParent.value)[0]
+    const valueParentSelect = Object.keys(selectCategoryParent.value)[0];
     getParentCategoryId = optionCategory.value.filter(
-      item => item.key == valueParentSelect
-    )[0].id
+      (item) => item.key == valueParentSelect
+    )[0].id;
   }
 
-  visible.value = false
-  resetForm()
+  visible.value = false;
+  resetForm();
   await category.actionCreateCategory({
-    ...values,
-    parentCategoryId: getParentCategoryId
-  })
-})
+    ...dataForm.value,
+    parentCategoryId: getParentCategoryId,
+  });
+});
 
-const title = ref([{ name: 'All' }, { name: 'ParentId' }, { name: 'Name' }])
+const title = ref([{ name: "All" }, { name: "ParentId" }, { name: "Name" }]);
+
+const handleUpdateCategory = (data) => {
+  titlePopup.value = 'Update Category'
+  nameAction.value = 'Update'
+  visible.value = true
+  dataForm.value = data
+  let dataSelect = []
+  const valueSelectItem = optionCategory.value.find(val => val.id === data.parentCategoryId)
+  console.log(valueSelectItem)
+  if (valueSelectItem) {
+    dataSelect = [
+      ...dataSelect,
+      { 
+        key:valueSelectItem.id,
+        label:valueSelectItem.label
+      },
+    ]
+    selectCategoryParent.value = dataSelect
+  }
+};
+
+const handleActionCategory = async (data,type) => {
+  const categoryId = data.id
+  if(type == TypeAction.DELETE){
+    Swal.fire({
+        text: `Do you want delete category { ${data.nameCategory} } ?`,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await category.blockDeleteCategory(categoryId,type);
+        } else if (result.isDenied) {
+          await Swal.fire("Changes are not saved", "", "info");
+        }
+      });
+  }
+}
+
+watch(visible, (value) => {
+  if(!value){
+    dataForm.value = {
+      nameCategory:'',
+      description:''
+    }
+    selectCategoryParent.value = null;
+    titlePopup.value = 'Add Category'
+    nameAction.value = 'Create'
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -210,14 +287,14 @@ const title = ref([{ name: 'All' }, { name: 'ParentId' }, { name: 'Name' }])
     }
   }
 }
-</style>
-
-<style>
 .p-treeselect-items-wrapper {
   max-height: 200px !important;
 }
 
 .p-inputtext {
   width: 100% !important;
+}
+.btn_group {
+  column-gap: 10px;
 }
 </style>
